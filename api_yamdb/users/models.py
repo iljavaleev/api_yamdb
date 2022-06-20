@@ -26,5 +26,9 @@ class User(AbstractUser):
         choices=roles,
         default=user,
     )
+    email = models.EmailField(
+        blank=False,
+        max_length=254,
+    )
 
 
