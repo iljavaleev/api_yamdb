@@ -4,14 +4,14 @@ from django.db import models
 
 class User(AbstractUser):
     
-    user = 'u'
-    moderator = 'm'
-    admin = 'a'
+    USER = 'u'
+    MODERATOR = 'm'
+    ADMIN = 'a'
 
-    roles = [
-    (user, 'user'),
-    (moderator, 'moderator'),
-    (admin, 'admin'),
+    ROLES = [
+    (USER, 'user'),
+    (MODERATOR, 'moderator'),
+    (ADMIN, 'admin'),
     ]
 
 
@@ -23,8 +23,8 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=1,
         blank=False,
-        choices=roles,
-        default=user,
+        choices=ROLES,
+        default=USER,
     )
     email = models.EmailField(
         blank=False,
