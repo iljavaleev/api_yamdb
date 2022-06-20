@@ -1,19 +1,17 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    
     USER = 'user'
     MODERATOR = 'moderator'
     ADMIN = 'admin'
 
     ROLES = [
-    (USER, 'user'),
-    (MODERATOR, 'moderator'),
-    (ADMIN, 'admin'),
+        (USER, 'user'),
+        (MODERATOR, 'moderator'),
+        (ADMIN, 'admin'),
     ]
-
 
     bio = models.TextField(
         'Биография',
@@ -29,7 +27,5 @@ class User(AbstractUser):
     email = models.EmailField(
         blank=False,
         max_length=254,
-        unique=True
+        unique=True,
     )
-
-
