@@ -25,10 +25,3 @@ urlpatterns = [
         name='redoc'
     ),
 ]
-
-<<<<<<< HEAD
-# test
-=======
-
-# test2
->>>>>>> origin/master
