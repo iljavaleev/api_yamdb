@@ -4,9 +4,9 @@ from django.db import models
 
 class User(AbstractUser):
     
-    USER = 'u'
-    MODERATOR = 'm'
-    ADMIN = 'a'
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
 
     ROLES = [
     (USER, 'user'),
@@ -21,7 +21,7 @@ class User(AbstractUser):
         max_length=100,
     )
     role = models.CharField(
-        max_length=1,
+        max_length=9,
         blank=False,
         choices=ROLES,
         default=USER,
