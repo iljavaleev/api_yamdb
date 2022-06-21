@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from django.contrib.auth import get_user_model
-from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from api.models import Comment, Review
+from users.models import User
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -39,4 +40,28 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ('post',)
 
 
-# class SignupUserSerializer(serializers.ModelSerializer):
+class SignupUserSerializer(serializers.Serializer):
+
+    username = serializers.CharField(
+        validators=(UniqueValidator(queryset=User.objects.all()),)
+    )
+    email = serializers.EmailField(
+        validators=(UniqueValidator(queryset=User.objects.all()),)
+    )
+
+    class Meta:
+        validators = (
+            serializers.UniqueTogetherValidator(
+                queryset=User.objects.all(),
+                fields=('username', 'email'),
+                message='Обязательные поля'
+            ),
+        )
+
+    def create(self, validated_data):
+        return User.objects.create(**validated_data)
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError('"me" — запретное имя пользователя')
+        return data
