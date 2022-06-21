@@ -30,7 +30,6 @@ class Review(models.Model):
         related_name='reviews'
     )
     score = models.IntegerField(
-        max_length=10,
         choices=CHOICES
     )
     pub_date = models.DateTimeField(
