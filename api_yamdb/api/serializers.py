@@ -39,3 +39,4 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ('post',)
 
 
+# class SignupUserSerializer(serializers.ModelSerializer):
