@@ -12,7 +12,7 @@ router.register(
      basename='reviews'
 )
 router.register(
-     r'titles/(?P<title_id>[0-9]+)/reviews/(?P<review_id>[0-9]+/comments/',
+     r'titles/(?P<title_id>[0-9]+)/reviews/(?P<review_id>[0-9]+)/comments/',
      CommentViewSet,
      basename='comments'
 )
