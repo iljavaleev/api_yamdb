@@ -1,23 +1,42 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
 
 User = get_user_model()
 
 
-class Title(models.Model):
-    pass
+class Genre(models.Model):
+    name = models.CharField(max_length=200, default=None)
+    slug = models.SlugField(unique=True, default=None)
 
 
 class Category(models.Model):
-    pass
+    name = models.CharField(max_length=200, default=None)
+    slug = models.SlugField(unique=True, default=None)
 
 
-class Genre(models.Model):
-    pass
+class Title(models.Model):
+    name = models.CharField(max_length=200, default=None)
+    year = models.IntegerField(default=None)
+    category = models.ForeignKey(Category,
+                                 on_delete=models.SET_NULL,
+                                 blank=True,
+                                 null=True)
+    genre = models.ManyToManyField(Genre,
+                                   through='GenreTitle',
+                                   related_name='title_genre',
+                                   blank=True)
+
+
+class GenreTitle(models.Model):
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
 
 class Review(models.Model):
     CHOICES = [(i, i) for i in range(11)]
     title = models.ForeignKey(
+        Title,
         on_delete=models.CASCADE,
         related_name='reviews'
     )
@@ -28,7 +47,6 @@ class Review(models.Model):
         related_name='reviews'
     )
     score = models.IntegerField(
-        max_length=10,
         choices=CHOICES
     )
     pub_date = models.DateTimeField(
@@ -38,6 +56,7 @@ class Review(models.Model):
 
 class Comment(models.Model):
     review = models.ForeignKey(
+        Review,
         on_delete=models.CASCADE,
         related_name='comments'
     )
