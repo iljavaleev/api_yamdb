@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -18,6 +19,7 @@ class Genre(models.Model):
 class Review(models.Model):
     CHOICES = [(i, i) for i in range(11)]
     title = models.ForeignKey(
+        Title,
         on_delete=models.CASCADE,
         related_name='reviews'
     )
@@ -38,6 +40,7 @@ class Review(models.Model):
 
 class Comment(models.Model):
     review = models.ForeignKey(
+        Review,
         on_delete=models.CASCADE,
         related_name='comments'
     )
