@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
-# python3 manage.py runscript name
+# python3 manage.py runscript scripts.{file_name}
 import csv
 
 User = get_user_model()
+
 
 def run():
     fhand = open('static/data/users.csv')
