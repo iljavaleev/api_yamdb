@@ -4,16 +4,32 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class Title(models.Model):
-    pass
+class Genre(models.Model):
+    name = models.CharField(max_length=200, default=None)
+    slug = models.SlugField(unique=True, default=None)
 
 
 class Category(models.Model):
-    pass
+    name = models.CharField(max_length=200, default=None)
+    slug = models.SlugField(unique=True, default=None)
 
 
-class Genre(models.Model):
-    pass
+class Title(models.Model):
+    name = models.CharField(max_length=200, default=None)
+    year = models.IntegerField(default=None)
+    category = models.ForeignKey(Category,
+                                 on_delete=models.SET_NULL,
+                                 blank=True,
+                                 null=True)
+    genre = models.ManyToManyField(Genre,
+                                   through='GenreTitle',
+                                   related_name='title_genre',
+                                   blank=True)
+
+
+class GenreTitle(models.Model):
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
 
 class Review(models.Model):
@@ -27,10 +43,11 @@ class Review(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='reviews'
+        related_name='reviews',
     )
     score = models.IntegerField(
-        choices=CHOICES
+        choices=CHOICES,
+        default=0,
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,

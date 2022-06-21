@@ -8,6 +8,7 @@ from .serializers import ReviewSerializer, CommentSerializer
 from rest_framework.permissions import AllowAny
 
 
+
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
