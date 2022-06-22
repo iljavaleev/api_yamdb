@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.shortcuts import render
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from api.models import Review, Comment, Genre, Title, Category
 from users.models import User
@@ -16,6 +17,11 @@ from .serializers import (
     GenreSerializer,
     TitleSerializer,
     UserSerializer
+)
+from .permissions import (
+    IsAuthorOrReadOnly,
+    IsModeratorPermission,
+    IsAdminPermission
 )
 # from .permissions import SignupUserPermission
 from rest_framework.permissions import AllowAny
@@ -46,20 +52,37 @@ class UsersViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    # permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly,)
     # pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    def get_permissions(self):
+        if self.action == 'delete' or self.action == 'update':
+            return (
+                    IsAuthorOrReadOnly
+                    | IsModeratorPermission
+                    | IsAdminPermission
+            )
+        return (IsAuthenticatedOrReadOnly, )
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    # permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly,)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_permissions(self):
+        if self.action == 'delete' or self.action == 'update':
+            return (
+                    IsAuthorOrReadOnly
+                    | IsModeratorPermission
+                    | IsAdminPermission
+            )
+        return (IsAuthenticatedOrReadOnly, )
 
 
 class SignupUserViewSet(generics.CreateAPIView):

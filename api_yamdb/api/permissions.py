@@ -1,5 +1,7 @@
 from rest_framework import permissions
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class SignupUserPermission(permissions.BasePermission):
 
@@ -14,3 +16,38 @@ class SignupUserPermission(permissions.BasePermission):
             request.method in permissions.SAFE_METHODS
             or obj.author == request.user
         )
+
+#пока черновые
+class IsAuthorOrReadOnly(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        return (request.method in permissions.SAFE_METHODS or obj.author
+                == request.user)
+
+
+class IsModeratorPermission(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        return (
+            request.method in permissions.SAFE_METHODS
+            or request.user.role == User.MODERATOR
+        )
+
+class IsAdminPermission(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        return (
+            request.method in permissions.SAFE_METHODS
+            or request.user.is_staff
+            or request.user.is_superuser
+        )
+
+#
+# class IsSuperUserPermission(permissions.BasePermission):
+#
+#     def has_object_permission(self, request, view, obj):
+#         return (
+#                 request.method in permissions.SAFE_METHODS
+#                 or request.user.is_superuser
+#         )
+

@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from django.db.models import Avg
 
+
 from api.models import Comment, Review, Title, Category, Genre
 from users.models import User
 
