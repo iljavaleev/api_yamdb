@@ -3,7 +3,7 @@ from rest_framework.relations import SlugRelatedField
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from django.db.models import Avg
-
+from django.shortcuts import get_object_or_404
 
 from api.models import Comment, Review, Title, Category, Genre
 from users.models import User
@@ -110,3 +110,22 @@ class SignupUserSerializer(serializers.Serializer):
             raise serializers.ValidationError('"me" — запретное имя пользователя')
         return data
 
+
+
+class TokenUserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=150)
+    confirmation_code = serializers.CharField(max_length=50)
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'confirmation_code'
+        )
+
+    def validate(self, data):
+        user = get_object_or_404(User, username=data['username'])
+        confirmation_code = user.confirmation_code
+        if data['confirmation_code'] != confirmation_code:
+            raise serializers.ValidationError("Неверный код подтверждения")
+        return data
