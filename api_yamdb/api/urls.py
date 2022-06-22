@@ -14,6 +14,7 @@ from .views import (
 
 router = DefaultRouter()
 
+router.register(r'users', UsersViewSet, basename='users')
 router.register('categories', CategoriesViewSet, basename='categories')
 router.register('genres', GenresViewSet, basename='genres')
 router.register('titles', TitlesViewSet, basename='titles')
@@ -27,7 +28,7 @@ router.register(
      CommentViewSet,
      basename='comments'
 )
-router.register('users', UsersViewSet, basename='users')
+
 
 
 urlpatterns = [
