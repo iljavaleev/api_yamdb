@@ -46,9 +46,47 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
+        model = User
+        validators = (
+            serializers.UniqueTogetherValidator(
+                queryset=User.objects.all(),
+                fields=('username', 'email'),
+            ),
+        )
+
+class UserMeSerializer(serializers.ModelSerializer):
+    # role = serializers.StringRelatedField(read_only=True)
+    role = serializers.PrimaryKeyRelatedField(read_only=True)
+    
+
     class Meta:
         model = User
-        fields = '__all__'
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
+
+        validators = (
+            serializers.UniqueTogetherValidator(
+                queryset=User.objects.all(),
+                fields=('username', 'email'),
+            ),
+        )
+
 
 
 class ReviewSerializer(serializers.ModelSerializer):
