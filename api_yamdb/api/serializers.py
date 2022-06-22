@@ -3,7 +3,7 @@ from rest_framework.relations import SlugRelatedField
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueTogetherValidator
 
-from api.models import Comment, Review
+from api.models import Comment, Review, Genre, Category, Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -38,4 +38,30 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id', 'review_id', 'text', 'author', 'pub_date')
         read_only_fields = ('post',)
 
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = '__all__'
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', many=True,
+        queryset=Genre.objects.all()
+    )
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all()
+    )
+
+    class Meta:
+        model = Title
+        fields = '__all__'
 
