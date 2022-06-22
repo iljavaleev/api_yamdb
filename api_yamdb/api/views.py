@@ -2,9 +2,10 @@ import uuid
 
 from django.conf import settings
 from django.core.mail import EmailMessage
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework_simplejwt.tokens import AccessToken
 
 from api.models import Review, Comment, Genre, Title, Category
 from users.models import User
@@ -16,7 +17,8 @@ from .serializers import (
     CategorySerializer,
     GenreSerializer,
     TitleSerializer,
-    UserSerializer
+    UserSerializer,
+    TokenUserSerializer
 )
 from .permissions import (
     IsAuthorOrReadOnly,
@@ -109,3 +111,25 @@ class SignupUserViewSet(generics.CreateAPIView):
         serializer.save(
             confirmation_code=self.confirmation_code,
         )
+
+
+class TokenUserViewSet(generics.CreateAPIView):
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = TokenUserSerializer
+
+
+
+
+    def get_object(self):
+        return get_object_or_404(User, username=self.request.user)
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(
+            User,
+            username=serializer.validated_data['username']
+        )
+        
+        response = {'token': str(AccessToken.for_user(user))}
+        return Response(response, status=status.HTTP_200_OK)

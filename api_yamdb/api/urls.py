@@ -9,6 +9,7 @@ from .views import (
      GenresViewSet,
      TitlesViewSet,
      UsersViewSet,
+     TokenUserViewSet
 )
 
 router = DefaultRouter()
@@ -27,12 +28,10 @@ router.register(
      basename='comments'
 )
 router.register('users', UsersViewSet, basename='users')
-# router.register(r'auth/signup/', SignupUserViewSet, basename='signup')
 
 
 urlpatterns = [
      path('v1/', include(router.urls)),
      path('v1/auth/signup/', SignupUserViewSet.as_view(), name='signup'),
-     path('v1/', include('djoser.urls')),
-     path('v1/', include('djoser.urls.jwt')),
+     path('v1/auth/token/', TokenUserViewSet.as_view(), name='token'),
 ]
