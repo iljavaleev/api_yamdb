@@ -53,9 +53,9 @@ class TitlesViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
 
 
-class UsersViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+# class UsersViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -139,7 +139,7 @@ class TokenUserViewSet(generics.CreateAPIView):
         return Response(response, status=status.HTTP_200_OK)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UsersViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminPermission,)
     pagination_class = PageNumberPagination
     queryset = User.objects.all()
