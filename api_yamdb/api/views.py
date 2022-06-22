@@ -6,12 +6,9 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.tokens import AccessToken
-<<<<<<< HEAD
 from rest_framework.decorators import action
-=======
 from rest_framework.pagination import LimitOffsetPagination
 
->>>>>>> origin
 
 from api.models import Review, Comment, Genre, Title, Category
 from users.models import User
