@@ -5,14 +5,43 @@ from django.core.mail import EmailMessage
 from django.shortcuts import render
 from rest_framework.response import Response
 
-from api.models import Review, Comment
+from api.models import Review, Comment, Genre, Title, Category
 from users.models import User
 from rest_framework import permissions, viewsets, generics, status
-from .serializers import ReviewSerializer, CommentSerializer, SignupUserSerializer
+from .serializers import (
+    ReviewSerializer,
+    CommentSerializer,
+    SignupUserSerializer,
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer,
+    UserSerializer
+)
 # from .permissions import SignupUserPermission
 from rest_framework.permissions import AllowAny
 
 EMAIL = 'from@example.com'
+
+
+class CategoriesViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class GenresViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+
+
+class TitlesViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+
+
+class UsersViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()

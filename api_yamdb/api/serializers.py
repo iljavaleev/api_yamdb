@@ -2,9 +2,52 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
+from django.db.models import Avg
 
-from api.models import Comment, Review
+from api.models import Comment, Review, Title, Category, Genre
 from users.models import User
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Title
+        fields = (
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category'
+            )
+
+    def get_rating(self, obj):
+        return (
+            Review.
+            objects.
+            filter(title=obj).
+            aggregate(Avg('score'))['score__avg']
+        )
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -65,3 +108,4 @@ class SignupUserSerializer(serializers.Serializer):
         if data['username'] == 'me':
             raise serializers.ValidationError('"me" — запретное имя пользователя')
         return data
+
