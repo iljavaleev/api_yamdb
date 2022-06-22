@@ -6,6 +6,8 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.pagination import LimitOffsetPagination
+
 
 from api.models import Review, Comment, Genre, Title, Category
 from users.models import User
@@ -34,6 +36,7 @@ EMAIL = 'from@example.com'
 class CategoriesViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (IsAuthorOrReadOnly,)
 
 
 class GenresViewSet(viewsets.ModelViewSet):
@@ -54,8 +57,7 @@ class UsersViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
-    # pagination_class = LimitOffsetPagination
+    pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -63,16 +65,17 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'delete' or self.action == 'update':
             return (
-                    IsAuthorOrReadOnly
-                    | IsModeratorPermission
-                    | IsAdminPermission
+                    IsAuthorOrReadOnly()
+                    | IsModeratorPermission()
+                    | IsAdminPermission()
             )
-        return (IsAuthenticatedOrReadOnly, )
+        return (IsAuthenticatedOrReadOnly(), )
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -80,11 +83,11 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'delete' or self.action == 'update':
             return (
-                    IsAuthorOrReadOnly
-                    | IsModeratorPermission
-                    | IsAdminPermission
+                    IsAuthorOrReadOnly()
+                    |IsModeratorPermission()
+                    |IsAdminPermission()
             )
-        return (IsAuthenticatedOrReadOnly, )
+        return (IsAuthenticatedOrReadOnly(), )
 
 
 class SignupUserViewSet(generics.CreateAPIView):
@@ -116,9 +119,6 @@ class SignupUserViewSet(generics.CreateAPIView):
 class TokenUserViewSet(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = TokenUserSerializer
-
-
-
 
     def get_object(self):
         return get_object_or_404(User, username=self.request.user)
