@@ -7,7 +7,11 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
+<<<<<<< HEAD
 from django.db import IntegrityError
+=======
+from rest_framework import filters
+>>>>>>> eb67dd015325b7620a656cbd34565526590197b0
 
 
 from actions.models import Review, Comment, Genre, Title, Category
@@ -37,20 +41,35 @@ from rest_framework.permissions import AllowAny
 EMAIL = 'from@example.com'
 
 
-class CategoriesViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = (IsAuthorOrReadOnly,)
-
-
 class GenresViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=name', '=slug',)
+    http_method_names = ['get', ]
+
+    def perform_create(self, serializer):
+        serializer.save(admin=self.request.admin)
+
+
+class CategoriesViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=name', '=slug',)
+    http_method_names = ['get', ]
+
+    def perform_create(self, serializer):
+        serializer.save(admin=self.request.admin)
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    http_method_names = ['get', ]
+
+    def perform_create(self, serializer):
+        serializer.save(admin=self.request.admin)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
