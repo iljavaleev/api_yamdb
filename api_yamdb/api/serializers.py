@@ -122,64 +122,52 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ('post',)
 
 
-# class SignupUserSerializer(serializers.Serializer):
-
-#     username = serializers.CharField(
-#         validators=(UniqueValidator(queryset=User.objects.all()),)
-#     )
-#     email = serializers.EmailField(
-#         validators=(UniqueValidator(queryset=User.objects.all()),)
-#     )
-
-#     class Meta:
-#         validators = (
-#             serializers.UniqueTogetherValidator(
-#                 queryset=User.objects.all(),
-#                 fields=('username', 'email'),
-#                 message='Обязательные поля'
-#             ),
-#         )
-
-#     def validate(self, data):
-#         if data['username'] == 'me':
-#             raise serializers.ValidationError('"me" — запретное имя пользователя')
-#         return data
-
-#     def create(self, validated_data):
-#         return User.objects.create(**validated_data)
-
-        
-
-
-
-
-
 class SignupUserSerializer(serializers.ModelSerializer):
 
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField(max_length=254)
 
     class Meta:
-        model = User
-        fields = ['username', 'email']
-
-    def create(self, validated_data):
-        return User.objects.create(**validated_data)
+        fields=('username', 'email')
+        model=User
+        # validators = (
+        #     serializers.UniqueTogetherValidator(
+        #         queryset=User.objects.all(),
+        #         fields=('username', 'email'),
+        #         message='Обязательные поля'
+        #     ),
+        #)
 
     def validate(self, data):
-        user = get_object_or_404(User, username=data['username'])
-
-        if user.username == 'me':
-            raise serializers.ValidationError(
-                '"me" — запретное имя пользователя'
-            )
-        elif User.objects.filter(username=data['username']).exists():
-            raise serializers.ValidationError('Такое имя пользователя уже существует')
-        elif User.objects.filter(email=data['email']).exists():
-            raise serializers.ValidationError('Такой email уже существует')
+        if data['username'] == 'me':
+            raise serializers.ValidationError('"me" — запретное имя пользователя')
         return data
 
+    def create(self, validated_data):
+        if User.objects.filter(
+            email=validated_data['email'],
+            username=validated_data['username']
+            ).exists():
+            # if User.objects.filter(username=validated_data['username']).exists():
+            
+            user = get_object_or_404(
+                User,
+                username=validated_data['username'],
+                email=validated_data['email']
+            )
+            return user
 
+        elif User.objects.filter(email=validated_data['email']).exists():
+            if not User.objects.filter(username=validated_data['username']).exists():
+                raise serializers.ValidationError('такой email уже существует')
+
+        elif User.objects.filter(username=validated_data['username']).exists():
+            if not User.objects.filter(email=validated_data['email']).exists():
+                raise serializers.ValidationError('такой username уже существует')      
+        
+        return User.objects.create(**validated_data)
+
+        
 
 class TokenUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=150)

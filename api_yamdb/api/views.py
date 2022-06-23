@@ -94,19 +94,19 @@ class SignupUserViewSet(generics.CreateAPIView):
     serializer_class = SignupUserSerializer
     confirmation_code = str(uuid.uuid4())
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(
-            serializer.data,
-            status = status.HTTP_200_OK
-        )
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #     return Response(
+    #         serializer.data,
+    #         status = status.HTTP_200_OK
+    #     )
 
     def perform_create(self, serializer):
         EmailMessage(
             'Confirmation_code',
-            f'Код подтверждения: {self.confirmation_code}',
+            f'Код подтверждения для {serializer.validated_data["username"]}: {self.confirmation_code}',
             EMAIL,
             (serializer.validated_data['email'],)
         ).send()
