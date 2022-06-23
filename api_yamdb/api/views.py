@@ -89,19 +89,50 @@ class CommentViewSet(viewsets.ModelViewSet):
         return (IsAuthenticatedOrReadOnly(), )
 
 
+# class SignupUserViewSet(generics.CreateAPIView):
+#     permission_classes = (permissions.AllowAny,)
+#     serializer_class = SignupUserSerializer
+#     confirmation_code = str(uuid.uuid4())
+
+#     def create(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         self.perform_create(serializer)
+#         return Response(
+#             serializer.data,
+#             status=status.HTTP_200_OK,
+#         )
+
+
+#     def perform_create(self, serializer):
+#         EmailMessage(
+#             'Confirmation_code',
+#             f'Код подтверждения для {serializer.validated_data["username"]}: {self.confirmation_code}',
+#             EMAIL,
+#             (serializer.validated_data['email'],)
+#         ).send()
+#         serializer.save(
+#             confirmation_code=self.confirmation_code,
+#         )
+#         # return Response(
+#         #     status = status.HTTP_200_OK
+#         # )
+    
+
 class SignupUserViewSet(generics.CreateAPIView):
-    permission_classes = (permissions.AllowAny,)
     serializer_class = SignupUserSerializer
     confirmation_code = str(uuid.uuid4())
+    permission_classes = (permissions.AllowAny,)
 
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create(serializer)
-    #     return Response(
-    #         serializer.data,
-    #         status = status.HTTP_200_OK
-    #     )
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        self.perform_create(serializer)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
 
     def perform_create(self, serializer):
         EmailMessage(
@@ -116,8 +147,8 @@ class SignupUserViewSet(generics.CreateAPIView):
 
 
 class TokenUserViewSet(generics.CreateAPIView):
-    permission_classes = (permissions.AllowAny,)
     serializer_class = TokenUserSerializer
+    permission_classes = (permissions.AllowAny,)
 
     def get_object(self):
         return get_object_or_404(User, username=self.request.user)
@@ -129,9 +160,33 @@ class TokenUserViewSet(generics.CreateAPIView):
             User,
             username=serializer.validated_data['username']
         )
-        
         response = {'token': str(AccessToken.for_user(user))}
         return Response(response, status=status.HTTP_200_OK)
+
+
+# def get_tokens_for_user(user):
+#     access = AccessToken.for_user(user)
+#     return {'token': str(access)}
+
+
+
+# class TokenUserViewSet(generics.CreateAPIView):
+#     permission_classes = (permissions.AllowAny,)
+#     serializer_class = TokenUserSerializer
+
+#     def get_object(self):
+#         return get_object_or_404(User, username=self.request.user)
+
+#     def create(self, request):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         user = get_object_or_404(
+#             User,
+#             username=serializer.validated_data['username']
+#         )
+        
+#         response = {'token': str(AccessToken.for_user(user))}
+#         return Response(response, status=status.HTTP_200_OK)
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -156,4 +211,7 @@ class UsersViewSet(viewsets.ModelViewSet):
             self.partial_update(request)
             request.user.refresh_from_db()
         serializer = self.get_serializer(request.user)
-        return Response(serializer.data)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
