@@ -272,30 +272,36 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class SignupUserSerializer(serializers.Serializer):
     username = serializers.CharField(
-        max_length=150,
-        validators=(UniqueValidator(queryset=User.objects.all()),)
+        max_length=150
     )
-    email = serializers.EmailField(
-        max_length=254,
-        validators=(UniqueValidator(queryset=User.objects.all()),)
-    )
-
-    class Meta:
-        validators = (
-            serializers.UniqueTogetherValidator(
-                queryset=User.objects.all(),
-                fields=('username', 'email'),
-                message='Поля username и email обязательны для заполнения'
-            ),
-        )
+    email = serializers.EmailField()
 
     def create(self, validated_data):
+        # user = User.objects.filter(
+        #     email=validated_data['email'],
+        #     username=validated_data['username']
+        # )
+        # # if user.exists():
+        # #     return user
+   
+
         return User.objects.create(**validated_data)
 
     def validate(self, data):
         if data['username'] == 'me':
             raise serializers.ValidationError('"me" — запретное имя пользователя')
+        
+        elif User.objects.filter(email=data['email']).exists():
+            if not User.objects.filter(username=data['username']).exists():
+                raise serializers.ValidationError('такой email уже существует')
+
+        elif User.objects.filter(username=data['username']).exists():
+            if not User.objects.filter(email=data['email']).exists():
+                raise serializers.ValidationError('такой username уже существует')   
+
         return data
+
+
 
 
 class TokenUserSerializer(serializers.ModelSerializer):
