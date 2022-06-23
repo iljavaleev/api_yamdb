@@ -53,11 +53,6 @@ class TitlesViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
 
 
-# class UsersViewSet(viewsets.ModelViewSet):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-
-
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
@@ -152,6 +147,7 @@ class UsersViewSet(viewsets.ModelViewSet):
         methods=['get', 'patch'],
         detail=False,
         permission_classes=(IsAuthenticatedPermission,),
+        # permission_classes=(IsAdminPermission,),
         serializer_class=UserMeSerializer
     )
     def me(self, request):
