@@ -147,6 +147,7 @@ class UsersViewSet(viewsets.ModelViewSet):
         methods=['get', 'patch'],
         detail=False,
         permission_classes=(IsAuthenticatedPermission,),
+        # permission_classes=(IsAdminPermission|IsModeratorPermission|IsAuthorOrReadOnly, ),
         serializer_class=UserMeSerializer
     )
     def me(self, request):
