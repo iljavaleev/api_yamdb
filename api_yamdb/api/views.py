@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import filters
 
 from api.models import Review, Comment, Genre, Category, Title
 from rest_framework import permissions, viewsets
@@ -27,6 +28,8 @@ class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     # permission_classes = (IsAuthorOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=name',)
     http_method_names = ['get', ]
 
     def perform_create(self, serializer):
@@ -37,6 +40,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     # permission_classes = (IsAuthorOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=name',)
     http_method_names = ['get', ]
 
     def perform_create(self, serializer):
