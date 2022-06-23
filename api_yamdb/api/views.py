@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 
 
-from api.models import Review, Comment, Genre, Title, Category
+from actions.models import Review, Comment, Genre, Title, Category
 from users.models import User
 from rest_framework import permissions, viewsets, generics, status, filters
 from rest_framework.pagination import PageNumberPagination

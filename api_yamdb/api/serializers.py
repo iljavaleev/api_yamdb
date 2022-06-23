@@ -6,7 +6,7 @@ from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
-from api.models import Comment, Review, Title, Category, Genre
+from actions.models import Comment, Review, Title, Category, Genre
 from users.models import User
 
 
