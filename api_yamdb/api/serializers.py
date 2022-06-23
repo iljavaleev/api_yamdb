@@ -95,14 +95,16 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='username',
         default=serializers.CurrentUserDefault(),
     )
+    lookup_field = 'review_id'
 
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
+        read_only_fields = ('title', )
 
         validators = [
             UniqueTogetherValidator(
-                fields=('author', 'title_id'),
+                fields=('author', 'title'),
                 queryset=Review.objects.all(),
 
             )
@@ -115,11 +117,13 @@ class CommentSerializer(serializers.ModelSerializer):
         slug_field='username',
         default=serializers.CurrentUserDefault(),
     )
+    lookup_field = 'comment_id'
+
 
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
-        read_only_fields = ('post',)
+        read_only_fields = ('review', )
 
 
 class SignupUserSerializer(serializers.ModelSerializer):

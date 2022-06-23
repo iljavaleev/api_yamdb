@@ -1,6 +1,6 @@
 import csv
 # python3 manage.py runscript scripts.{file_name}
-from api.models import Genre, Title, GenreTitle
+from actions.models import Genre, Title, GenreTitle
 
 
 def run():

@@ -59,16 +59,26 @@ class ReviewViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(
+            author=self.request.user,
+            title=get_object_or_404(Title, id=self.kwargs.get('title_id')),
+        )
+
 
     def get_permissions(self):
-        if self.action == 'delete' or self.action == 'update':
-            return (
-                    IsAuthorOrReadOnly()
-                    | IsModeratorPermission()
-                    | IsAdminPermission()
-            )
-        return (IsAuthenticatedOrReadOnly(), )
+        if self.action == 'delete':
+            permission_classes = [IsAuthorOrReadOnly|IsModeratorPermission|IsAdminPermission]
+        elif  self.action == 'update':
+            permission_classes = [
+                IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
+        permission_classes = [IsAuthenticatedOrReadOnly]
+
+        return [permission() for permission in permission_classes]
+
+
+
+
+
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -77,16 +87,21 @@ class CommentViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user,
+                        review=get_object_or_404(Review, id=self.kwargs.get(
+                            'review_id')),
+                        )
 
     def get_permissions(self):
-        if self.action == 'delete' or self.action == 'update':
-            return (
-                    IsAuthorOrReadOnly()
-                    |IsModeratorPermission()
-                    |IsAdminPermission()
-            )
-        return (IsAuthenticatedOrReadOnly(), )
+        if self.action == 'delete':
+            permission_classes = [
+                IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
+        elif self.action == 'update':
+            permission_classes = [
+                IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
+        permission_classes = [IsAuthenticatedOrReadOnly]
+
+        return [permission() for permission in permission_classes]
 
 
 class SignupUserViewSet(generics.CreateAPIView):

@@ -1,5 +1,5 @@
 import csv
-from api.models import Category
+from actions.models import Category
 # python3 manage.py runscript scripts.{file_name}
 
 
