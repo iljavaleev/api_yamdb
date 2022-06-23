@@ -1,7 +1,6 @@
 import uuid
-
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, send_mail
 from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -119,6 +118,65 @@ class CommentViewSet(viewsets.ModelViewSet):
 #         # )
     
 
+# class SignupUserViewSet(generics.CreateAPIView):
+#     serializer_class = SignupUserSerializer
+#     confirmation_code = str(uuid.uuid4())
+#     permission_classes = (permissions.AllowAny,)
+
+#     def create(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+
+#         self.perform_create(serializer)
+#         return Response(
+#             serializer.data,
+#             status=status.HTTP_200_OK,
+#         )
+
+#     def perform_create(self, serializer):
+#         EmailMessage(
+#             'Confirmation_code',
+#             f'Код подтверждения для {serializer.validated_data["username"]}: {self.confirmation_code}',
+#             EMAIL,
+#             (serializer.validated_data['email'],)
+#         ).send()
+#         serializer.save(
+#             confirmation_code=self.confirmation_code,
+#         )
+
+
+# class TokenUserViewSet(generics.CreateAPIView):
+#     serializer_class = TokenUserSerializer
+#     permission_classes = (permissions.AllowAny,)
+
+#     def get_object(self):
+#         return get_object_or_404(User, username=self.request.user)
+
+#     def create(self, request):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         user = get_object_or_404(
+#             User,
+#             username=serializer.validated_data['username']
+#         )
+#         response = {'token': str(AccessToken.for_user(user))}
+#         return Response(response, status=status.HTTP_200_OK)
+
+
+# # def get_tokens_for_user(user):
+# #     access = AccessToken.for_user(user)
+# #     return {'token': str(access)}
+
+
+
+#
+
+
+
+
+
+
+
 class SignupUserViewSet(generics.CreateAPIView):
     serializer_class = SignupUserSerializer
     confirmation_code = str(uuid.uuid4())
@@ -127,11 +185,12 @@ class SignupUserViewSet(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data,
             status=status.HTTP_200_OK,
+            headers=headers
         )
 
     def perform_create(self, serializer):
@@ -160,33 +219,29 @@ class TokenUserViewSet(generics.CreateAPIView):
             User,
             username=serializer.validated_data['username']
         )
-        response = {'token': str(AccessToken.for_user(user))}
+        response = get_tokens_for_user(user)
         return Response(response, status=status.HTTP_200_OK)
 
 
-# def get_tokens_for_user(user):
-#     access = AccessToken.for_user(user)
-#     return {'token': str(access)}
+def get_tokens_for_user(user):
+    access = AccessToken.for_user(user)
+    return {'token': str(access)}
 
 
 
-# class TokenUserViewSet(generics.CreateAPIView):
-#     permission_classes = (permissions.AllowAny,)
-#     serializer_class = TokenUserSerializer
 
-#     def get_object(self):
-#         return get_object_or_404(User, username=self.request.user)
 
-#     def create(self, request):
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         user = get_object_or_404(
-#             User,
-#             username=serializer.validated_data['username']
-#         )
-        
-#         response = {'token': str(AccessToken.for_user(user))}
-#         return Response(response, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+
+
+
+
 
 
 class UsersViewSet(viewsets.ModelViewSet):
