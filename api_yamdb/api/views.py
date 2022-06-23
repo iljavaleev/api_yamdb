@@ -5,8 +5,9 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
+from django.db import IntegrityError
 
 
 from actions.models import Review, Comment, Genre, Title, Category
@@ -88,62 +89,51 @@ class CommentViewSet(viewsets.ModelViewSet):
         return (IsAuthenticatedOrReadOnly(), )
 
 
-class SignupUserViewSet(generics.CreateAPIView):
-    serializer_class = SignupUserSerializer
-    confirmation_code = str(uuid.uuid4())
-    permission_classes = (permissions.AllowAny,)
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def SignupUser(request):
+    serializer = SignupUserSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    email = serializer.validated_data['email']
+    username = serializer.validated_data['username']
+    try:
+        user, create = User.objects.get_or_create(
+            username=username,
+            email=email
+        )
+    except IntegrityError:
         return Response(
-            serializer.data,
-            status=status.HTTP_200_OK,
-            headers=headers
-        )
-
-    def perform_create(self, serializer):
-        EmailMessage(
-            'Confirmation_code',
-            f'Код подтверждения для {serializer.validated_data["username"]}: {self.confirmation_code}',
-            EMAIL,
-            (serializer.validated_data['email'],)
-        ).send()
-        serializer.save(
-            confirmation_code=self.confirmation_code,
+            'Такой логин или email уже существуют',
+            status=status.HTTP_400_BAD_REQUEST
         )
 
 
-class TokenUserViewSet(generics.CreateAPIView):
-    serializer_class = TokenUserSerializer
-    permission_classes = (permissions.AllowAny,)
-
-    def get_object(self):
-        return get_object_or_404(User, username=self.request.user)
-
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = get_object_or_404(
-            User,
-            username=serializer.validated_data['username']
-        )
-        response = get_tokens_for_user(user)
-        return Response(response, status=status.HTTP_200_OK)
+    confirmation_code = str(uuid.uuid4())
+    user.confirmation_code = confirmation_code
+    user.save()
+    send_mail(
+        'Код подверждения',
+        f'Код подтверждения для {serializer.validated_data["username"]}: {confirmation_code}',
+        # confirmation_code,
+        EMAIL,
+        (email, ),
+        fail_silently=False
+    )
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-def get_tokens_for_user(user):
-    access = AccessToken.for_user(user)
-    return {'token': str(access)}
-
-
-
-
-
-
-
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def TokenUser(request):
+    serializer = TokenUserSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    username = serializer.validated_data['username']
+    confirmation_code = serializer.validated_data['confirmation_code']
+    current_user = get_object_or_404(User, username=username)
+    if confirmation_code == current_user.confirmation_code:
+        token = str(AccessToken.for_user(current_user))
+        return Response({'token': token}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 

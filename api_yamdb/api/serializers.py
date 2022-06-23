@@ -119,173 +119,10 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ('post',)
 
 
-# class SignupUserSerializer(serializers.ModelSerializer):
-
-#     username = serializers.CharField(max_length=150)
-#     email = serializers.EmailField(max_length=254)
-
-#     class Meta:
-#         fields=('username', 'email')
-#         model=User
-
-#     def validate(self, data):
-#         if data['username'] == 'me':
-#             raise serializers.ValidationError('"me" — запретное имя пользователя')
-        
-#         elif User.objects.filter(email=data['email']).exists():
-#             if not User.objects.filter(username=data['username']).exists():
-#                 raise serializers.ValidationError('такой email уже существует')
-
-#         elif User.objects.filter(username=data['username']).exists():
-#             if not User.objects.filter(email=data['email']).exists():
-#                 raise serializers.ValidationError('такой username уже существует')   
-
-#         return data
-
-#     def create(self, validated_data):
-#         if User.objects.filter(
-#             email=validated_data['email'],
-#             username=validated_data['username']
-#             ).exists():
-            
-#             user = get_object_or_404(
-#                 User,
-#                 username=validated_data['username'],
-#                 email=validated_data['email']
-#             )
-#             return user
-            
-
-#         return User.objects.create(**validated_data)
-
-
-# class SignupUserSerializer(serializers.Serializer):
-#     username = serializers.CharField()
-#     email = serializers.EmailField()
-
-#     class Meta:
-#         fields=('username', 'email')
-  
-
-#     def validate(self, data):
-#         if data['username'] == 'me':
-#             raise serializers.ValidationError('"me" — запретное имя пользователя')
-        
-#         elif User.objects.filter(email=data['email']).exists():
-#             if not User.objects.filter(username=data['username']).exists():
-#                 raise serializers.ValidationError('такой email уже существует')
-
-#         elif User.objects.filter(username=data['username']).exists():
-#             if not User.objects.filter(email=data['email']).exists():
-#                 raise serializers.ValidationError('такой username уже существует')   
-
-#         return data
-
-#     def create(self, validated_data):
-#         if User.objects.filter(
-#             email=validated_data['email'],
-#             username=validated_data['username']
-#             ).exists():
-            
-#             user = get_object_or_404(
-#                 User,
-#                 username=validated_data['username'],
-#                 email=validated_data['email']
-#             )
-#             return user
-            
-
-#         return User.objects.create(**validated_data)
-
-# class TokenUserSerializer(serializers.ModelSerializer):
-#     username = serializers.CharField(max_length=150)
-#     confirmation_code = serializers.CharField(max_length=50)
-
-#     class Meta:
-#         model = User
-#         fields = (
-#             'username',
-#             'confirmation_code'
-#         )
-
-#     def validate(self, data):
-#         user = get_object_or_404(User, username=data['username'])
-#         confirmation_code = user.confirmation_code
-#         if data['confirmation_code'] != confirmation_code:
-#             raise serializers.ValidationError("Неверный код подтверждения")
-#         return data
-
-
-# class TokenUserSerializer(serializers.ModelSerializer):
-#     username = serializers.CharField(max_length=150)
-#     confirmation_code = serializers.CharField(max_length=150)
-
-#     class Meta:
-#         model = User
-#         fields = (
-#             'username',
-#             'confirmation_code'
-#         )
-
-#     def validate(self, data):
-#         user = get_object_or_404(User, username=data['username'])
-#         confirmation_code = user.confirmation_code
-#         if data['confirmation_code'] != confirmation_code:
-#             raise serializers.ValidationError("Неверный код подтверждения")
-#         return data
-
-
-
-
-# class SignupUserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = (
-#             'email',
-#             'username'
-#         )
-
-#     def validate(self, attrs):
-#         username = attrs.get('username')
-
-#         if username == 'me':
-#             raise serializers.ValidationError(
-#                 'Запрещенное имя для пользователя'
-#             )
-#         return attrs
-
-#     def create(self, validated_data):
-#         return User.objects.create_user(**validated_data)
-
-
-# class TokenUserSerializer(serializers.ModelSerializer):
-#     username = serializers.CharField()
-#     confirmation_code = serializers.CharField()
-
-#     class Meta:
-#         model = User
-#         fields = (
-#             'username',
-#             'confirmation_code'
-#         )
-
-
 class SignupUserSerializer(serializers.Serializer):
-    username = serializers.CharField(
-        max_length=150
-    )
-    email = serializers.EmailField()
+    email = serializers.EmailField(max_length=254, required=True)
+    username = serializers.CharField(max_length=150, required=True)
 
-    def create(self, validated_data):
-        # user = User.objects.filter(
-        #     email=validated_data['email'],
-        #     username=validated_data['username']
-        # )
-        # # if user.exists():
-        # #     return user
-   
-
-        return User.objects.create(**validated_data)
 
     def validate(self, data):
         if data['username'] == 'me':
@@ -302,22 +139,13 @@ class SignupUserSerializer(serializers.Serializer):
         return data
 
 
+    class Meta:
+        fields = ('username', 'email')
 
 
-class TokenUserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField()
-    confirmation_code = serializers.CharField()
+class TokenUserSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150, required=True)
+    confirmation_code = serializers.CharField(required=True)
 
     class Meta:
-        model = User
-        fields = (
-            'username',
-            'confirmation_code'
-        )
-
-    def validate(self, data):
-        user = get_object_or_404(User, username=data['username'])
-        confirmation_code = user.confirmation_code
-        if data['confirmation_code'] != confirmation_code:
-            raise serializers.ValidationError("Неверный код подтверждения")
-        return data
+        fields = ('username', 'confirmation_code')
