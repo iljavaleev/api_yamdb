@@ -1,3 +1,4 @@
+from genericpath import exists
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from django.contrib.auth import get_user_model
@@ -65,7 +66,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 class UserMeSerializer(serializers.ModelSerializer):
-    # role = serializers.StringRelatedField(read_only=True)
     role = serializers.PrimaryKeyRelatedField(read_only=True)
     
 
@@ -131,6 +131,7 @@ class SignupUserSerializer(serializers.Serializer):
         validators=(UniqueValidator(queryset=User.objects.all()),)
     )
 
+
     class Meta:
         validators = (
             serializers.UniqueTogetherValidator(
@@ -147,6 +148,31 @@ class SignupUserSerializer(serializers.Serializer):
         if data['username'] == 'me':
             raise serializers.ValidationError('"me" — запретное имя пользователя')
         return data
+
+
+
+
+
+# class SignupUserSerializer(serializers.Serializer):
+
+#     username = serializers.CharField()
+#     email = serializers.EmailField()
+
+#     class Meta:
+#         model = User
+#         fields = ['username', 'email']
+
+#     def create(self, validated_data):
+#         return User.objects.create(**validated_data)
+
+#     def validate(self, data):
+#         user = get_object_or_404(User, username=data['username'])
+
+#         if user.username == 'me':
+#             raise serializers.ValidationError(
+#                 '"me" — запретное имя пользователя'
+#             )
+#         return data
 
 
 
