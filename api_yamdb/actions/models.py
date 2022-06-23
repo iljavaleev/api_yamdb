@@ -25,6 +25,8 @@ class Title(models.Model):
                                    through='GenreTitle',
                                    related_name='title_genre',
                                    blank=True)
+    description = models.TextField(blank=True)
+
 
 
 class GenreTitle(models.Model):
