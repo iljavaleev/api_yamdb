@@ -1,6 +1,6 @@
 import csv
 
-from api.models import Genre
+from actions.models import Genre
 
 
 def run():
