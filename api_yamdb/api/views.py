@@ -7,11 +7,8 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
-<<<<<<< HEAD
 from django.db import IntegrityError
-=======
 from rest_framework import filters
->>>>>>> eb67dd015325b7620a656cbd34565526590197b0
 
 
 from actions.models import Review, Comment, Genre, Title, Category
@@ -155,15 +152,6 @@ def TokenUser(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-
-
-
-
-
-
 class UsersViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminPermission,)
     pagination_class = PageNumberPagination
@@ -177,7 +165,6 @@ class UsersViewSet(viewsets.ModelViewSet):
         methods=['get', 'patch'],
         detail=False,
         permission_classes=(IsAuthenticatedPermission,),
-        # permission_classes=(IsAdminPermission|IsModeratorPermission|IsAuthorOrReadOnly, ),
         serializer_class=UserMeSerializer
     )
     def me(self, request):
