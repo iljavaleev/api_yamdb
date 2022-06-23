@@ -1,8 +1,6 @@
 from genericpath import exists
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField
-from django.contrib.auth import get_user_model
-from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
+from rest_framework.validators import UniqueTogetherValidator
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
@@ -130,13 +128,6 @@ class SignupUserSerializer(serializers.ModelSerializer):
     class Meta:
         fields=('username', 'email')
         model=User
-        # validators = (
-        #     serializers.UniqueTogetherValidator(
-        #         queryset=User.objects.all(),
-        #         fields=('username', 'email'),
-        #         message='Обязательные поля'
-        #     ),
-        #)
 
     def validate(self, data):
         if data['username'] == 'me':
@@ -148,7 +139,6 @@ class SignupUserSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             username=validated_data['username']
             ).exists():
-            # if User.objects.filter(username=validated_data['username']).exists():
             
             user = get_object_or_404(
                 User,
