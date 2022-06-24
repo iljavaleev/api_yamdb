@@ -40,12 +40,14 @@ class IsAdminPermission(permissions.BasePermission):
             # request.method in permissions.SAFE_METHODS
             # or request.user.is_authenticated
             request.user.is_authenticated
+            and request.user.is_admin
         )
 
     def has_object_permission(self, request, view, obj):
         return (
-            request.user.is_staff
-            or request.user.is_superuser
+            request.user.is_admin
+            # or request.user.is_superuser
+            # request.user['role'] == 'admin'
         )
 
 class IsAuthenticatedPermission(permissions.BasePermission):
@@ -59,10 +61,10 @@ class IsAuthenticatedPermission(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.is_authenticated
-            or request.user.user.is_staff
-            or request.user.is_superuser
+            # request.method in permissions.SAFE_METHODS
+            request.user.is_authenticated
+            or request.user.is_admin
+            # or request.user.is_superuser
         )
 
 #
