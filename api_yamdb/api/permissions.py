@@ -45,5 +45,3 @@ class IsAuthenticatedPermission(permissions.BasePermission):
             or request.user.is_admin
             or request.user.is_moderator
         )
-
-# d
