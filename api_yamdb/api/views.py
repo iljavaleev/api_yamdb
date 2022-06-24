@@ -147,7 +147,7 @@ def SignupUser(request):
     user.confirmation_code = confirmation_code
     user.save()
     send_mail(
-        'Код подверждения',
+        'Confirmation_code',
         f'Код подтверждения для {serializer.validated_data["username"]}: {confirmation_code}',
         # confirmation_code,
         EMAIL,
@@ -173,7 +173,7 @@ def TokenUser(request):
 
 class UsersViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminPermission,)
-    pagination_class = PageNumberPagination
+    pagination_class = LimitOffsetPagination
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (filters.SearchFilter,)
