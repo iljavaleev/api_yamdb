@@ -64,7 +64,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserMeSerializer(serializers.ModelSerializer):
     role = serializers.PrimaryKeyRelatedField(read_only=True)
-    
 
     class Meta:
         model = User
@@ -96,14 +95,16 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
+        read_only_fields = ('title', )
 
-        validators = [
-            UniqueTogetherValidator(
-                fields=('author', 'title_id'),
-                queryset=Review.objects.all(),
-
-            )
-        ]
+    def validate(self, data):
+        title_id = self.context.get('view').kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        author = self.context.get('request').user
+        if Review.objects.filter(title=title, author=author).count() >=0:
+            raise serializers.ValidationError(
+                'Вы можете оставить только один отзыв')
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -116,7 +117,7 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
-        read_only_fields = ('post',)
+        read_only_fields = ('review', )
 
 
 class SignupUserSerializer(serializers.Serializer):
