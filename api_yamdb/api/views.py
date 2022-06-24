@@ -85,13 +85,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
         )
 
     def get_permissions(self):
-        if self.action == 'delete':
-            permission_classes = [
-                IsAuthorOrReadOnly|IsModeratorPermission|IsAdminPermission]
-        elif  self.action == 'update':
+        if self.action in ['destroy','update','partial_update']:
             permission_classes = [
                 IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
-        permission_classes = [IsAuthenticatedOrReadOnly]
+        else:
+            permission_classes = [IsAuthenticatedOrReadOnly]
+
 
         return [permission() for permission in permission_classes]
 
@@ -113,13 +112,11 @@ class CommentViewSet(viewsets.ModelViewSet):
                         )
 
     def get_permissions(self):
-        if self.action == 'delete':
+        if self.action in ['destroy', 'update', 'partial_update']:
             permission_classes = [
                 IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
-        elif self.action == 'update':
-            permission_classes = [
-                IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
-        permission_classes = [IsAuthenticatedOrReadOnly]
+        else:
+            permission_classes = [IsAuthenticatedOrReadOnly]
 
         return [permission() for permission in permission_classes]
 
