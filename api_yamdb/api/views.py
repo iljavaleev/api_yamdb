@@ -32,7 +32,6 @@ from .permissions import (
     IsAdminPermission,
     IsAuthenticatedPermission
 )
-# from .permissions import SignupUserPermission
 from rest_framework.permissions import AllowAny
 
 EMAIL = 'from@example.com'
