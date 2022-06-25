@@ -4,11 +4,11 @@ from rest_framework import permissions
 User = get_user_model()
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
-
+    #убрал токен, нужен отдельный
     def has_object_permission(self, request, view, obj):
         return (
             request.method in permissions.SAFE_METHODS 
-            or obj.token == request.user
+            or  obj.author == request.user
         )
 
 

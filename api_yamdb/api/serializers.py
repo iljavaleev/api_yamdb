@@ -1,10 +1,11 @@
 from rest_framework import serializers, status
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from django.db.models import Avg
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.response import Response
-from actions.models import Comment, Review, Title, Category, Genre
+from actions.models import Comment, Review, Title, Category, Genre, GenreTitle
 from users.models import User
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,8 +16,21 @@ class CategorySerializer(serializers.ModelSerializer):
         )
         lookup_field = 'slug'
 
+class TitlesField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        return {"name": value.name, "slug": value.slug}
+
+
 class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
+    genre = TitlesField(
+        queryset=Genre.objects.all(),
+        slug_field='slug', many=True
+    )
+    category = TitlesField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
 
     class Meta:
         model = Title
@@ -39,6 +53,7 @@ class TitleSerializer(serializers.ModelSerializer):
         )
 
 
+
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
@@ -47,6 +62,7 @@ class GenreSerializer(serializers.ModelSerializer):
             'slug'
         )
         lookup_field = 'slug'
+
 
 
 class UserSerializer(serializers.ModelSerializer):
