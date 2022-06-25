@@ -43,7 +43,6 @@ class MixinSetList(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,
-    mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
     pass
