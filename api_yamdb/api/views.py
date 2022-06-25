@@ -30,7 +30,8 @@ from .permissions import (
     IsAuthorOrReadOnly,
     IsModeratorPermission,
     IsAdminPermission,
-    IsAuthenticatedPermission
+    IsAuthenticatedPermission,
+    IsAdminOrReadOnlyPermission
 )
 from rest_framework.permissions import AllowAny
 
@@ -63,6 +64,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     http_method_names = ['get', ]
+    permission_classes = (IsAdminOrReadOnlyPermission,)
 
     def perform_create(self, serializer):
         serializer.save(admin=self.request.admin)
