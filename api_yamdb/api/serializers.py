@@ -16,15 +16,25 @@ class CategorySerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 class TitleSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()
+    # rating = serializers.SerializerMethodField()
+    genre = serializers.SlugRelatedField(
+        slug_field='genre',
+        queryset=Genre.objects.all(),
+    )
+
+    category = serializers.SlugRelatedField(
+        slug_field='category',
+        queryset=Category.objects.all(),
+    )
+
 
     class Meta:
         model = Title
         fields = (
-            'id',
+            # 'id',
             'name',
             'year',
-            'rating',
+            # 'rating',
             'description',
             'genre',
             'category'
