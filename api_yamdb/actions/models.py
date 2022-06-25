@@ -19,22 +19,19 @@ class Category(models.Model):
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=200, default=None,
-                            blank=True)
+    name = models.CharField(max_length=200, blank=False)
     year = models.IntegerField(
-        default=None, blank=True,
+        blank=False,
         validators=[MinValueValidator(-2000),
                     MaxValueValidator(datetime.date.today().year)])
     category = models.ForeignKey(Category,
                                  on_delete=models.SET_NULL,
-                                 blank=True, null=True)
+                                 blank=False, null=True)
     description = models.TextField(default=None)
     genre = models.ManyToManyField(Genre,
                                    through='GenreTitle',
                                    related_name='title_genre',
-                                   blank=True)
-    description = models.TextField(blank=True)
-
+                                   blank=False)
 
 
 class GenreTitle(models.Model):
