@@ -14,10 +14,9 @@ class Genre(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=256, blank=False,
-                            default=None)
-    slug = models.SlugField(max_length=50, blank=True,
-                            unique=True, default=None)
+    name = models.CharField(max_length=256, blank=False,)
+    slug = models.SlugField(max_length=50, blank=False,
+                            unique=True)
 
 
 class Title(models.Model):
