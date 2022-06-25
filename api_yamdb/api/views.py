@@ -58,6 +58,7 @@ class CategoriesViewSet(viewsets.ModelViewSet):
     search_fields = ('name', )
     # http_method_names = ['get', 'post', 'delete']
     permission_classes = (IsAdminOrReadOnlyPermission,)
+    lookup_field = 'slug'
 
     def perform_create(self, serializer):
         serializer.save()
