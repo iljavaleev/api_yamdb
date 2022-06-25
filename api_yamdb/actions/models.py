@@ -7,10 +7,9 @@ User = get_user_model()
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=256, blank=True,
-                            default=None)
-    slug = models.SlugField(max_length=50, unique=True,
-                            blank=True, default=None)
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(max_length=50,
+                            unique=True)
 
 
 class Category(models.Model):

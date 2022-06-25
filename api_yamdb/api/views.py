@@ -10,6 +10,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from django.db import IntegrityError
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins
 
 
 from actions.models import Review, Comment, Genre, Title, Category
@@ -39,17 +40,21 @@ from rest_framework.permissions import AllowAny
 EMAIL = 'from@example.com'
 
 
-class GenresViewSet(viewsets.ModelViewSet):
+class GenresViewSet(mixins.ListModelMixin ,
+                    mixins.CreateModelMixin,
+                    mixins.DestroyModelMixin,
+                    viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdminOrReadOnlyPermission,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', )
-    http_method_names = ['get', ]
 
-    def perform_create(self, serializer):
-        serializer.save(admin=self.request.admin)
-
+    def get_permissions(self):
+        if self.action in ['destroy','create']:
+            permission_classes = [IsAdminOrReadOnlyPermission]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
 
 class CategoriesViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -58,9 +63,6 @@ class CategoriesViewSet(viewsets.ModelViewSet):
     search_fields = ('name', )
     http_method_names = ['get', 'post', 'delete']
     permission_classes = (IsAdminOrReadOnlyPermission,)
-
-    def perform_create(self, serializer):
-        serializer.save()
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
