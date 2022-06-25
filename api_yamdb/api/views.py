@@ -54,10 +54,11 @@ class CategoriesViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('=name', '=slug',)
-    http_method_names = ['get', ]
+    http_method_names = ['get', 'post']
+    permission_classes = (IsAdminOrReadOnlyPermission,)
 
     def perform_create(self, serializer):
-        serializer.save(admin=self.request.admin)
+        serializer.save()
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
