@@ -15,7 +15,7 @@ from .views import (
 router = DefaultRouter()
 
 router.register(r'users', UsersViewSet, basename='users')
-router.register('categories', CategoriesViewSet, basename='categories')
+router.register(r'categories', CategoriesViewSet, basename='category')
 router.register('genres', GenresViewSet, basename='genres')
 router.register('titles', TitlesViewSet, basename='titles')
 router.register(

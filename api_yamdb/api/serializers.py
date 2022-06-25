@@ -13,7 +13,7 @@ class CategorySerializer(serializers.ModelSerializer):
             'name',
             'slug'
         )
-
+        lookup_field = 'slug'
 
 class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
@@ -42,7 +42,11 @@ class TitleSerializer(serializers.ModelSerializer):
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = ('name', 'slug')
+        fields = (
+            'name',
+            'slug'
+        )
+        lookup_field = 'slug'
 
 
 class UserSerializer(serializers.ModelSerializer):
