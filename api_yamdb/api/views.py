@@ -68,13 +68,16 @@ class CategoriesViewSet(viewsets.ModelViewSet):
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    http_method_names = ['get', ]
-    permission_classes = (IsAdminOrReadOnlyPermission,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
     filterset_fields = ('category', 'genre', 'name', 'year', )
 
-    def perform_create(self, serializer):
-        serializer.save(admin=self.request.admin)
+    def get_permissions(self):
+        if self.action in ['destroy', 'update', 'partial_update', 'create']:
+            permission_classes = [IsAdminOrReadOnlyPermission]
+        else:
+            permission_classes = [AllowAny]
+
+        return [permission() for permission in permission_classes]
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
