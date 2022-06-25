@@ -59,6 +59,11 @@ class CategoriesViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'delete']
     permission_classes = (IsAdminOrReadOnlyPermission,)
 
+    def get_queryset(self):
+        category = get_object_or_404(Category, pk=self.kwargs.get('category_id'))
+        return category.categories
+
+        
     def perform_create(self, serializer):
         serializer.save()
 
