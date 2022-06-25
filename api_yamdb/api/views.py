@@ -1,6 +1,6 @@
 import uuid
 from django.conf import settings
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -8,9 +8,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from django.db import IntegrityError
-from rest_framework import filters
+from rest_framework import filters, mixins
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins
 
 
 from actions.models import Review, Comment, Genre, Title, Category
@@ -39,15 +38,22 @@ from rest_framework.permissions import AllowAny
 
 EMAIL = 'from@example.com'
 
+class MixinSetList(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet
+):
+    pass
 
-class GenresViewSet(mixins.ListModelMixin ,
-                    mixins.CreateModelMixin,
-                    mixins.DestroyModelMixin,
-                    viewsets.GenericViewSet):
+
+class GenresViewSet(MixinSetList):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', )
+    lookup_field = 'slug'
 
     def get_permissions(self):
         if self.action in ['destroy','create']:
@@ -56,20 +62,20 @@ class GenresViewSet(mixins.ListModelMixin ,
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
-class CategoriesViewSet(viewsets.ModelViewSet):
+
+class CategoriesViewSet(MixinSetList):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', )
-    # http_method_names = ['get', 'post', 'delete']
-    permission_classes = (IsAdminOrReadOnlyPermission,)
     lookup_field = 'slug'
 
-    def perform_create(self, serializer):
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        return super().perform_destroy(instance)
+    def get_permissions(self):
+        if self.action in ['destroy','create']:
+            permission_classes = [IsAdminOrReadOnlyPermission]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
 
 
 class TitlesViewSet(viewsets.ModelViewSet):

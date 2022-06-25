@@ -14,10 +14,6 @@ class CategorySerializer(serializers.ModelSerializer):
             'slug'
         )
         lookup_field = 'slug'
-        # extra_kwargs = {
-        #     'slug': {'lookup_field': 'slug'}
-        # }
-
 
 class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
@@ -46,7 +42,11 @@ class TitleSerializer(serializers.ModelSerializer):
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = '__all__'
+        fields = (
+            'name',
+            'slug'
+        )
+        lookup_field = 'slug'
 
 
 class UserSerializer(serializers.ModelSerializer):
