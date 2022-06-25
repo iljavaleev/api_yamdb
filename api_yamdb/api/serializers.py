@@ -13,6 +13,10 @@ class CategorySerializer(serializers.ModelSerializer):
             'name',
             'slug'
         )
+        lookup_field = 'slug'
+        # extra_kwargs = {
+        #     'slug': {'lookup_field': 'slug'}
+        # }
 
 
 class TitleSerializer(serializers.ModelSerializer):

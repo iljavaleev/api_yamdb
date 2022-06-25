@@ -56,16 +56,14 @@ class CategoriesViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', )
-    http_method_names = ['get', 'post', 'delete']
+    # http_method_names = ['get', 'post', 'delete']
     permission_classes = (IsAdminOrReadOnlyPermission,)
 
-    def get_queryset(self):
-        category = get_object_or_404(Category, pk=self.kwargs.get('category_id'))
-        return category.categories
-
-        
     def perform_create(self, serializer):
         serializer.save()
+
+    def perform_destroy(self, instance):
+        return super().perform_destroy(instance)
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
