@@ -70,6 +70,7 @@ class GenresViewSet(MixinSetList):
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
+
 class CategoriesViewSet(MixinSetList):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
