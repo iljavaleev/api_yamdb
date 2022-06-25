@@ -43,7 +43,6 @@ class MixinSetList(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,
-    mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
     pass
@@ -69,6 +68,7 @@ class GenresViewSet(MixinSetList):
         else:
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
+
 
 class CategoriesViewSet(MixinSetList):
     queryset = Category.objects.all()
