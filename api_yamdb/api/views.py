@@ -9,6 +9,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from django.db import IntegrityError
 from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 from actions.models import Review, Comment, Genre, Title, Category
@@ -41,8 +42,9 @@ EMAIL = 'from@example.com'
 class GenresViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrReadOnlyPermission,)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('=name', '=slug',)
+    search_fields = ('name', )
     http_method_names = ['get', ]
 
     def perform_create(self, serializer):
@@ -53,7 +55,7 @@ class CategoriesViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('=name', '=slug',)
+    search_fields = ('name', )
     http_method_names = ['get', 'post', 'delete']
     permission_classes = (IsAdminOrReadOnlyPermission,)
 
@@ -66,6 +68,8 @@ class TitlesViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     http_method_names = ['get', ]
     permission_classes = (IsAdminOrReadOnlyPermission,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
+    filterset_fields = ('category', 'genre', 'name', 'year', )
 
     def perform_create(self, serializer):
         serializer.save(admin=self.request.admin)
