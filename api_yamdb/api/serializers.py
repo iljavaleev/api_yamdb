@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from actions.models import Comment, Review, Title, Category, Genre
 from users.models import User
 
+# cxv
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
