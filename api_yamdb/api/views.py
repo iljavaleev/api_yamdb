@@ -148,7 +148,6 @@ def SignupUser(request):
     send_mail(
         'Confirmation_code',
         f'Код подтверждения для {serializer.validated_data["username"]}: {confirmation_code}',
-        # confirmation_code,
         EMAIL,
         (email, ),
         fail_silently=False

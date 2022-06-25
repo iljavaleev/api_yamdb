@@ -18,12 +18,30 @@ class User(AbstractUser):
         blank=True,
         max_length=100,
     )
+
+    first_name = models.CharField(
+        max_length=150,
+        blank=True
+    )
+    
+    last_name = models.CharField(
+        max_length=150,
+        blank=True
+    )
+    
+    username = models.CharField(
+        'Имя пользователя',
+        max_length=150,
+        unique=True,
+    )
+
     role = models.CharField(
         max_length=9,
         blank=False,
         choices=ROLES,
         default=USER,
     )
+
     email = models.EmailField(
         blank=False,
         max_length=254,
