@@ -1,5 +1,5 @@
 from django.core.mail import send_mail
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
@@ -9,9 +9,7 @@ from django.db import IntegrityError
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
-    permissions,
     viewsets,
-    generics,
     status,
     filters,
     mixins
@@ -46,6 +44,7 @@ User = get_user_model()
 
 EMAIL = 'from@example.com'
 
+
 class MixinSetList(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -63,14 +62,14 @@ class GenresViewSet(MixinSetList):
     lookup_field = 'slug'
 
     def get_permissions(self):
-        if self.action in ['destroy','create']:
+        if self.action in ['destroy', 'create']:
             permission_classes = [IsAdminOrReadOnlyPermission]
         else:
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
     def get_permissions(self):
-        if self.action in ['destroy','create']:
+        if self.action in ['destroy', 'create']:
             permission_classes = [IsAdminOrReadOnlyPermission]
         else:
             permission_classes = [AllowAny]
@@ -85,7 +84,7 @@ class CategoriesViewSet(MixinSetList):
     lookup_field = 'slug'
 
     def get_permissions(self):
-        if self.action in ['destroy','create']:
+        if self.action in ['destroy', 'create']:
             permission_classes = [IsAdminOrReadOnlyPermission]
         else:
             permission_classes = [AllowAny]
@@ -123,7 +122,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         )
 
     def get_permissions(self):
-        if self.action in ['destroy','update','partial_update']:
+        if self.action in ['destroy', 'update', 'partial_update']:
             permission_classes = [
                 IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
         else:
