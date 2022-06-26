@@ -1,7 +1,7 @@
 from rest_framework import serializers, status
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from django.db.models import Avg
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from actions.models import Comment, Review, Title, Category, Genre, GenreTitle
 from users.models import User

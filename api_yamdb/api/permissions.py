@@ -3,8 +3,9 @@ from rest_framework import permissions
 
 User = get_user_model()
 
+
 class IsAuthorOrReadOnly(permissions.BasePermission):
-    #убрал токен, нужен отдельный
+
     def has_object_permission(self, request, view, obj):
         return (
             request.method in permissions.SAFE_METHODS 
@@ -15,24 +16,25 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
 class IsModeratorPermission(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.is_moderator
-        )
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if hasattr(request.user, 'role'):
+            return request.user.is_moderator
+        return False
+
 
 class IsAdminPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return (
-            # request.user.is_admin
             request.user.is_authenticated
             and request.user.is_admin
         )
 
     def has_object_permission(self, request, view, obj):
-        return (
-            request.user.is_admin
-        )
+        if hasattr(request.user, 'role'):
+            return request.user.is_admin
+        return False
 
 class IsAuthenticatedPermission(permissions.BasePermission):
 
