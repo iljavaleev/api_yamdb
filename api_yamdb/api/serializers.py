@@ -43,7 +43,7 @@ class TitleSerializer(serializers.ModelSerializer):
             'genre',
             'category'
             )
-
+        ordering = ['-id']
     def get_rating(self, obj):
         return (
             Review.
@@ -83,6 +83,7 @@ class UserSerializer(serializers.ModelSerializer):
                 fields=('username', 'email'),
             ),
         )
+        
 
 class UserMeSerializer(serializers.ModelSerializer):
     role = serializers.PrimaryKeyRelatedField(read_only=True)
