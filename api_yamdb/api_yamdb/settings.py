@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'reviews.apps.ActionsConfig',
 
 
-    'django_extensions',
+    # 'django_extensions',
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
