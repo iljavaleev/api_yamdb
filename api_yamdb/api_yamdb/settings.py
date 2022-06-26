@@ -27,11 +27,11 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'reviews.apps.ActionsConfig',
 
+    'rest_framework_simplejwt',
     'django_extensions',
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
-    'rest_framework_simplejwt',
     'drf_spectacular',
 ]
 
