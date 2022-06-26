@@ -1,10 +1,9 @@
-from rest_framework import serializers, status
-from rest_framework.validators import UniqueTogetherValidator
+from rest_framework import serializers
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
-from reviews.models import Comment, Review, Title, Category, Genre, GenreTitle
+from reviews.models import Comment, Review, Title, Category, Genre
 
 User = get_user_model()
 
@@ -42,7 +41,7 @@ class TitleSerializer(serializers.ModelSerializer):
             'description',
             'genre',
             'category'
-            )
+        )
 
     def get_rating(self, obj):
         return (
@@ -56,7 +55,7 @@ class TitleSerializer(serializers.ModelSerializer):
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = ('name','slug')
+        fields = ('name', 'slug')
         lookup_field = 'slug'
 
 
@@ -78,6 +77,7 @@ class UserSerializer(serializers.ModelSerializer):
                 fields=('username', 'email'),
             ),
         )
+
 
 class UserMeSerializer(serializers.ModelSerializer):
     role = serializers.PrimaryKeyRelatedField(read_only=True)
