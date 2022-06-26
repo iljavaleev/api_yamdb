@@ -1,5 +1,12 @@
 # Проект YaMDb-api
-##### Групповой проект Яндекс.Практикум | Программа python-разработчики | спринт 10
+##### Групповой проект Яндекс.Практикум | Программа python-разработчики | Спринт 10
+
+---
+
+### Авторы проекта
+
+[Илья Валеев](https://github.com/iljavaleev/) | [Александ Лахтюк](https://github.com/aslakhtyuk/) | [Дмитрий Кирсанов](https://github.com/vepsong/)
+
 
 ---
 ## О проекте YaMDb
@@ -21,6 +28,11 @@
 На одно произведение пользователь может оставить только один отзыв.
 
 ---
+
+## Используемые технологии
+
+* Django REST Framework
+* Simple-JWT
 
 ## Основные endpoint'ы
 
@@ -76,8 +88,8 @@ python manage.py runserver
 
 ## Авторы проекта
 
-Илья Валеев | Александ Лахтюк | Дмитрий Кирсанов
+[Илья Валеев](https://github.com/iljavaleev/) | [Александ Лахтюк](https://github.com/aslakhtyuk/) | [Дмитрий Кирсанов](https://github.com/vepsong/)
 
-[Илья Валеев](https://github.com/iljavaleev/) |
+
 
 
