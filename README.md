@@ -1,7 +1,5 @@
 # Проект YaMDb-api
 ##### Групповой проект Яндекс.Практикум | Программа python-разработчики | Спринт 10
-<<<<<<< HEAD
-
 ---
 
 ### Авторы проекта
@@ -111,33 +109,14 @@ python -m venv env
 python -m pip install --upgrade pip 
 pip install -r requirements.txt
 ```
-<<<<<<< HEAD
-
-=======
->>>>>>> a9b0ba7aba84dbd6f566a6c66c8135bbaf9956f2
 * Выполнить миграции:
 ```
 python manage.py makemigrations
 python manage.py migrate
 ```
-<<<<<<< HEAD
-
-=======
->>>>>>> a9b0ba7aba84dbd6f566a6c66c8135bbaf9956f2
 * Запустить тестовый сервер:
 ```
 python manage.py runserver
 ```
-<<<<<<< HEAD
-
-## Авторы проекта
-
-[Илья Валеев](https://github.com/iljavaleev/) | [Александ Лахтюк](https://github.com/aslakhtyuk/) | [Дмитрий Кирсанов](https://github.com/vepsong/)
-
-
-
-
-=======
 ## Авторы проекта
 [Илья Валеев](https://github.com/iljavaleev/) | [Александ Лахтюк](https://github.com/aslakhtyuk/) | [Дмитрий Кирсанов](https://github.com/vepsong/)
->>>>>>> a9b0ba7aba84dbd6f566a6c66c8135bbaf9956f2
