@@ -16,5 +16,5 @@ def run():
             id=row[0],
             title_id=title.id,
             genre_id=genre.id,
-            )
+        )
         genre_title.save()

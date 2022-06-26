@@ -43,6 +43,7 @@ class Title(models.Model):
     class Meta:
         ordering = ['-id']
 
+
 class GenreTitle(models.Model):
     title = models.ForeignKey(Title, on_delete=models.SET_NULL, null=True)
     genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
@@ -75,6 +76,7 @@ class Review(models.Model):
             models.UniqueConstraint(fields=['title', 'author'],
                                     name='one_review')
         ]
+
 
 class Comment(models.Model):
     review = models.ForeignKey(

@@ -128,7 +128,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         else:
             permission_classes = [IsAuthenticatedOrReadOnly]
 
-
         return [permission() for permission in permission_classes]
 
 
@@ -181,7 +180,8 @@ def SignupUser(request):
     user.save()
     send_mail(
         'Confirmation_code',
-        f'Код подтверждения для {serializer.validated_data["username"]}: {confirmation_code}',
+        f'Код подтверждения для {serializer.validated_data["username"]}: '
+        f'{confirmation_code}',
         EMAIL,
         (email, ),
         fail_silently=False
