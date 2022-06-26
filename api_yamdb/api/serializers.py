@@ -155,13 +155,9 @@ class SignupUserSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 'слишком короткое имя пользователя'
             )
-        
-        if (
-                User.
-                objects.
+        if (User. objects.
                 filter(email=data['email'], username=data['username']).
-                exists()
-        ):
+                exists()):
             raise serializers.ValidationError(
                 'такие email или имя пользователя уже существуют'
             )

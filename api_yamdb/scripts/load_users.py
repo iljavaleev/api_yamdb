@@ -20,5 +20,5 @@ def run():
             bio=row[4],
             first_name=row[5],
             last_name=row[6],
-            )
+        )
         user.save()

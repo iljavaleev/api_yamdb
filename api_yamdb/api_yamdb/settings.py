@@ -27,14 +27,12 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'reviews.apps.ActionsConfig',
 
-
+    'rest_framework_simplejwt',
     'django_extensions',
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
-    'rest_framework_simplejwt',
     'drf_spectacular',
-
 ]
 
 MIDDLEWARE = [
@@ -120,7 +118,7 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', 
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',

@@ -16,5 +16,5 @@ def run():
             id=row[0],
             name=row[1],
             slug=row[2],
-            )
+        )
         genre.save()
