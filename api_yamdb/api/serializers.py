@@ -3,7 +3,7 @@ from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from actions.models import Comment, Review, Title, Category, Genre, GenreTitle
+from reviews.models import Comment, Review, Title, Category, Genre, GenreTitle
 from users.models import User
 
 
@@ -123,12 +123,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         title_id = self.context.get('view').kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
         author = self.context.get('request').user
-        if self.partial or self.update:
-            (Review.objects.filter(title=title, author=author)
-             .update(text=data['text'], score=data['score']))
-        elif Review.objects.filter(title=title, author=author).exists():
-                raise serializers.ValidationError(
-                    'Вы можете оставить только один отзыв')
+
+        review = Review.objects.filter(title=title, author=author)
+
+        if review and not self.partial:
+            raise serializers.ValidationError(
+                'Вы можете оставить только один отзыв'
+            )
+
         return data
 
 

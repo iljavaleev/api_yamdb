@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 
 
-from actions.models import Review, Comment, Genre, Title, Category
+from reviews.models import Review, Comment, Genre, Title, Category
 from users.models import User
 from rest_framework import permissions, viewsets, generics, status, filters
 from rest_framework.pagination import PageNumberPagination
@@ -36,6 +36,7 @@ from .permissions import (
     IsAdminOrReadOnlyPermission,
 
 )
+
 from rest_framework.permissions import AllowAny
 
 EMAIL = 'from@example.com'
@@ -89,8 +90,8 @@ class CategoriesViewSet(MixinSetList):
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
-    filterset_fields = ('category', 'genre', 'name', 'year', )
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('category', 'genre__slug', 'name', 'year', )
 
     def get_permissions(self):
         if self.action in ['destroy', 'update', 'partial_update', 'create']:

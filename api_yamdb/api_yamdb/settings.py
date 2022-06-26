@@ -25,7 +25,7 @@ INSTALLED_APPS = [
 
     'users.apps.UsersConfig',
     'api.apps.ApiConfig',
-    'actions.apps.ActionsConfig',
+    'reviews.apps.ActionsConfig',
 
     'django_extensions',
     'rest_framework',
