@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 import csv
 
 from actions.models import Comment, Review
-from api.exceptions import UserNotFoundError
+from users.exceptions import UserNotFoundError
 
 User = get_user_model()
 

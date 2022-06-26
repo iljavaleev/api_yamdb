@@ -1,20 +1,20 @@
 from rest_framework import serializers, status
-from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
+from rest_framework.validators import UniqueTogetherValidator
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
+from django.contrib.auth import get_user_model
+
 from reviews.models import Comment, Review, Title, Category, Genre, GenreTitle
-from users.models import User
+
+User = get_user_model()
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = (
-            'name',
-            'slug'
-        )
+        fields = ('name', 'slug')
         lookup_field = 'slug'
+
 
 class TitlesField(serializers.SlugRelatedField):
     def to_representation(self, value):
@@ -53,16 +53,11 @@ class TitleSerializer(serializers.ModelSerializer):
         )
 
 
-
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = (
-            'name',
-            'slug'
-        )
+        fields = ('name','slug')
         lookup_field = 'slug'
-
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -105,7 +100,6 @@ class UserMeSerializer(serializers.ModelSerializer):
                 fields=('username', 'email'),
             ),
         )
-
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -152,21 +146,28 @@ class SignupUserSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=254, required=True)
     username = serializers.CharField(max_length=150, required=True)
 
-
     def validate(self, data):
         if data['username'] == 'me':
-            raise serializers.ValidationError('"me" — запретное имя пользователя')
-        
-        elif User.objects.filter(email=data['email']).exists():
-            if not User.objects.filter(username=data['username']).exists():
-                raise serializers.ValidationError('такой email уже существует')
+            raise serializers.ValidationError(
+                '"me" — запретное имя пользователя'
+            )
 
-        elif User.objects.filter(username=data['username']).exists():
-            if not User.objects.filter(email=data['email']).exists():
-                raise serializers.ValidationError('такой username уже существует')   
+        if len(data['username']) < 3:
+            raise serializers.ValidationError(
+                'слишком короткое имя пользователя'
+            )
+        
+        if (
+                User.
+                objects.
+                filter(email=data['email'], username=data['username']).
+                exists()
+        ):
+            raise serializers.ValidationError(
+                'такие email или имя пользователя уже существуют'
+            )
 
         return data
-
 
     class Meta:
         fields = ('username', 'email')

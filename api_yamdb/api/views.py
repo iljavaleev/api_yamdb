@@ -1,20 +1,25 @@
-import uuid
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from django.db import IntegrityError
-from rest_framework import filters, mixins
+from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins
+from rest_framework import (
+    permissions,
+    viewsets,
+    generics,
+    status,
+    filters,
+    mixins
+)
 
+import uuid
 
 from reviews.models import Review, Comment, Genre, Title, Category
-from users.models import User
-from rest_framework import permissions, viewsets, generics, status, filters
 from .serializers import (
     ReviewSerializer,
     CommentSerializer,
@@ -35,7 +40,9 @@ from .permissions import (
 
 )
 from .filters import TitleFilter
-from rest_framework.permissions import AllowAny
+
+User = get_user_model()
+
 
 EMAIL = 'from@example.com'
 
@@ -171,7 +178,6 @@ def SignupUser(request):
             'Такой логин или email уже существуют',
             status=status.HTTP_400_BAD_REQUEST
         )
-
 
     confirmation_code = str(uuid.uuid4())
     user.confirmation_code = confirmation_code
