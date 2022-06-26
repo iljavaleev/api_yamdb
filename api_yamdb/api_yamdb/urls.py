@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
-from rest_framework.authtoken import views
 
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -18,22 +17,15 @@ urlpatterns = [
         name='redoc'
     ),
     path('api/', include('api.urls')),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path(
+        'schema/redoc/',
+        SpectacularRedocView.as_view(url_name='schema'),
+        name='redoc',
+    ),
+    path(
+        'schema/swagger-ui/',
+        SpectacularSwaggerView.as_view(url_name='schema'),
+        name='swagger-ui',
+    ),
 ]
-
-
-
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-#     path('api/', include('api.urls')),
-#     path('schema/', SpectacularAPIView.as_view(), name='schema'),
-#     path(
-#         'schema/redoc/',
-#         SpectacularRedocView.as_view(url_name='schema'),
-#         name='redoc',
-#     ),
-#     path(
-#         'schema/swagger-ui/',
-#         SpectacularSwaggerView.as_view(url_name='schema'),
-#         name='swagger-ui',
-#     ),
-# ]
