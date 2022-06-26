@@ -1,5 +1,4 @@
 import uuid
-from django.conf import settings
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
@@ -16,7 +15,6 @@ from rest_framework import mixins
 from reviews.models import Review, Comment, Genre, Title, Category
 from users.models import User
 from rest_framework import permissions, viewsets, generics, status, filters
-from rest_framework.pagination import PageNumberPagination
 from .serializers import (
     ReviewSerializer,
     CommentSerializer,
@@ -36,7 +34,7 @@ from .permissions import (
     IsAdminOrReadOnlyPermission,
 
 )
-
+from .filters import TitleFilter
 from rest_framework.permissions import AllowAny
 
 EMAIL = 'from@example.com'
@@ -91,7 +89,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category', 'genre__slug', 'name', 'year', )
+    filterset_class = TitleFilter
 
     def get_permissions(self):
         if self.action in ['destroy', 'update', 'partial_update', 'create']:
