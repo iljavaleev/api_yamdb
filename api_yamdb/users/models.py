@@ -23,12 +23,10 @@ class User(AbstractUser):
         max_length=150,
         blank=True
     )
-    
     last_name = models.CharField(
         max_length=150,
         blank=True
     )
-    
     username = models.CharField(
         'Имя пользователя',
         max_length=150,
@@ -47,7 +45,6 @@ class User(AbstractUser):
         max_length=254,
         unique=True,
     )
-    
     confirmation_code = models.CharField(
         verbose_name='confirmation code',
         max_length=50,

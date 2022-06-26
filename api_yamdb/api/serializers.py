@@ -157,8 +157,7 @@ class SignupUserSerializer(serializers.Serializer):
             )
         if (User. objects.
                 filter(email=data['email'], username=data['username']).
-                exists()
-        ):
+                exists()):
             raise serializers.ValidationError(
                 'такие email или имя пользователя уже существуют'
             )
