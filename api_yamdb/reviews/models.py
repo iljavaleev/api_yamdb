@@ -12,11 +12,17 @@ class Genre(models.Model):
     slug = models.SlugField(max_length=50,
                             unique=True)
 
+    class Meta:
+        ordering = ['-id']
+
 
 class Category(models.Model):
     name = models.CharField(max_length=256, blank=False,)
     slug = models.SlugField(max_length=50, blank=False,
                             unique=True)
+
+    class Meta:
+        ordering = ['-id']
 
 
 class Title(models.Model):
@@ -34,6 +40,8 @@ class Title(models.Model):
                                    related_name='title_genre',
                                    blank=False)
 
+    class Meta:
+        ordering = ['-id']
 
 class GenreTitle(models.Model):
     title = models.ForeignKey(Title, on_delete=models.SET_NULL, null=True)
@@ -62,6 +70,7 @@ class Review(models.Model):
     )
 
     class Meta:
+        ordering = ['-id']
         constraints = [
             models.UniqueConstraint(fields=['title', 'author'],
                                     name='one_review')
@@ -82,3 +91,6 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True,
     )
+
+    class Meta:
+        ordering = ['-id']
