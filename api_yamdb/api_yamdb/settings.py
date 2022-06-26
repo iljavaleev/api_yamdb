@@ -27,11 +27,14 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'reviews.apps.ActionsConfig',
 
+
     'django_extensions',
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'drf_spectacular',
+
 ]
 
 MIDDLEWARE = [
@@ -123,7 +126,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
 }
@@ -135,4 +138,4 @@ SIMPLE_JWT = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails') 
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')

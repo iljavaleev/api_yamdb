@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+
 import datetime
 
 User = get_user_model()
@@ -32,7 +33,6 @@ class Title(models.Model):
                                    through='GenreTitle',
                                    related_name='title_genre',
                                    blank=False)
-
 
 
 class GenreTitle(models.Model):
