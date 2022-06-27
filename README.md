@@ -7,7 +7,6 @@
 
 [Илья Валеев](https://github.com/iljavaleev/) | [Александ Лахтюк](https://github.com/aslakhtyuk/) | [Дмитрий Кирсанов](https://github.com/vepsong/)
 
-
 ---
 ## О проекте YaMDb
 
