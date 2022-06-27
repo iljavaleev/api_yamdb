@@ -147,20 +147,20 @@ class SignupUserSerializer(serializers.Serializer):
 
     def validate(self, data):
         if data['username'] == 'me':
-            raise serializers.ValidationError(
-                '"me" — запретное имя пользователя'
-            )
+            raise serializers.ValidationError('"me" — запретное имя пользователя')
 
         if len(data['username']) < 3:
             raise serializers.ValidationError(
                 'слишком короткое имя пользователя'
             )
-        if (User. objects.
-                filter(email=data['email'], username=data['username']).
-                exists()):
-            raise serializers.ValidationError(
-                'такие email или имя пользователя уже существуют'
-            )
+
+        if User.objects.filter(email=data['email']).exists():
+            if not User.objects.filter(username=data['username']).exists():
+                raise serializers.ValidationError('такой email уже существует')
+
+        if User.objects.filter(username=data['username']).exists():
+            if not User.objects.filter(email=data['email']).exists():
+                raise serializers.ValidationError('такой username уже существует')
 
         return data
 
