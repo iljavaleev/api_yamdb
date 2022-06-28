@@ -62,9 +62,13 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews',
     )
-    score = models.IntegerField(
-        choices=CHOICES,
-        default=0,
+    score = models.PositiveIntegerField(
+        validators=[
+            MaxValueValidator(
+                10,
+                message='Поставьте оценку в диапазоне от 0 до 10'
+            )
+        ]
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,

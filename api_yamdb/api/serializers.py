@@ -11,7 +11,7 @@ User = get_user_model()
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('name', 'slug')
+        exclude = ('id', )
         lookup_field = 'slug'
 
 
@@ -21,7 +21,7 @@ class TitlesField(serializers.SlugRelatedField):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()
+    rating = serializers.FloatField(read_only=True)
     genre = TitlesField(
         queryset=Genre.objects.all(),
         slug_field='slug', many=True
@@ -43,19 +43,11 @@ class TitleSerializer(serializers.ModelSerializer):
             'category'
         )
 
-    def get_rating(self, obj):
-        return (
-            Review.
-            objects.
-            filter(title=obj).
-            aggregate(Avg('score'))['score__avg']
-        )
-
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = ('name', 'slug')
+        exclude = ('id', )
         lookup_field = 'slug'
 
 
@@ -115,12 +107,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         title_id = self.context.get('view').kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
         author = self.context.get('request').user
 
-        review = Review.objects.filter(title=title, author=author)
-
-        if review and not self.partial:
+        if (Review.objects.filter(title_id=title_id, author=author).exists()
+                and not self.partial):
             raise serializers.ValidationError(
                 'Вы можете оставить только один отзыв'
             )
@@ -145,6 +135,7 @@ class SignupUserSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=254, required=True)
     username = serializers.CharField(max_length=150, required=True)
 
+<<<<<<< HEAD
     def validate(self, data):
         if data['username'] == 'me':
             raise serializers.ValidationError('"me" — запретное имя пользователя')
@@ -161,8 +152,27 @@ class SignupUserSerializer(serializers.Serializer):
         if User.objects.filter(username=data['username']).exists():
             if not User.objects.filter(email=data['email']).exists():
                 raise serializers.ValidationError('такой username уже существует')
+=======
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                '"me" — запретное имя пользователя'
+            )
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError(
+                'такое имя пользователя уже существует'
+            )
+>>>>>>> master
 
-        return data
+        return value
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError(
+                'такой email уже существует'
+            )
+
+        return value
 
     class Meta:
         fields = ('username', 'email')
