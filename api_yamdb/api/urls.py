@@ -1,9 +1,10 @@
+# насчет создания дерикторий пока не совсем понимаю,
+# и чтобы не все не покрашить оставлю так
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (ReviewViewSet, CommentViewSet, SignupUser,
-                    CategoriesViewSet, GenresViewSet, TitlesViewSet,
-                    UsersViewSet, TokenUser)
+from .views import (ReviewViewSet, CommentViewSet, CategoriesViewSet,
+                    GenresViewSet, TitlesViewSet, UsersViewSet)
 
 router = DefaultRouter()
 
