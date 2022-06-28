@@ -18,8 +18,13 @@ router.register(
     CommentViewSet,
     basename='comments'
 )
+# router.register(r'signup', SignupUser, basename='signup')
+
+auth_list = ("'signup/', SignupUser")
+
 urlpatterns = [
     path('v1/', include(router.urls)),
-    path('v1/auth/signup/', SignupUser),
+    # path('v1/auth/signup/', SignupUser),
+    path('v1/auth/', include(auth_list)),
     path('v1/auth/token/', TokenUser)
 ]

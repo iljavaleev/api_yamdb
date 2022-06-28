@@ -123,16 +123,11 @@ def SignupUser(request):
     serializer.is_valid(raise_exception=True)
     email = serializer.validated_data['email']
     username = serializer.validated_data['username']
-    try:
-        user, create = User.objects.get_or_create(
+
+    user, _ = User.objects.get_or_create(
             username=username,
             email=email
-        )
-    except IntegrityError:
-        return Response(
-            'Такой логин или email уже существуют',
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    )
 
     confirmation_code = str(uuid.uuid4())
     user.confirmation_code = confirmation_code
