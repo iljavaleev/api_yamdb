@@ -135,10 +135,14 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Review.objects.get(id=review_id).comments.all()
 
     def perform_create(self, serializer):
+        title_id = self.kwargs.get('title_id')
+        review_id = self.kwargs.get('review_id')
         serializer.save(author=self.request.user,
-                        review=get_object_or_404(Review, id=self.kwargs.get(
-                            'review_id')),
-                        )
+                        review=get_object_or_404(
+                            Review,
+                            id=review_id,
+                            title_id=title_id
+                        ))
 
     def get_permissions(self):
         if self.action in ['destroy', 'update', 'partial_update']:
