@@ -135,25 +135,24 @@ class SignupUserSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=254, required=True)
     username = serializers.CharField(max_length=150, required=True)
 
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError(
-                '"me" — запретное имя пользователя'
-            )
-        if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError(
-                'такое имя пользователя уже существует'
-            )
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError('"me" — запретное имя пользователя')
 
-        return value
-
-    def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
+        if len(data['username']) < 3:
             raise serializers.ValidationError(
-                'такой email уже существует'
+                'слишком короткое имя пользователя'
             )
 
-        return value
+        if User.objects.filter(email=data['email']).exists():
+            if not User.objects.filter(username=data['username']).exists():
+                raise serializers.ValidationError('такой email уже существует')
+
+        if User.objects.filter(username=data['username']).exists():
+            if not User.objects.filter(email=data['email']).exists():
+                raise serializers.ValidationError('такой username уже существует')
+
+        return data
 
     class Meta:
         fields = ('username', 'email')
