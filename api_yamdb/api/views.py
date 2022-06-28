@@ -1,3 +1,4 @@
+from django.conf import settings as st
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -6,6 +7,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from django.db import IntegrityError
+from django.db.models import CharField, Value
+from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
@@ -42,10 +45,7 @@ from .filters import TitleFilter
 User = get_user_model()
 
 
-EMAIL = 'from@example.com'
-
-
-class MixinSetList(
+class CreateDestroyListMixin(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,
@@ -54,7 +54,7 @@ class MixinSetList(
     pass
 
 
-class GenresViewSet(MixinSetList):
+class GenresViewSet(CreateDestroyListMixin):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
@@ -68,15 +68,8 @@ class GenresViewSet(MixinSetList):
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
-    def get_permissions(self):
-        if self.action in ['destroy', 'create']:
-            permission_classes = [IsAdminOrReadOnlyPermission]
-        else:
-            permission_classes = [AllowAny]
-        return [permission() for permission in permission_classes]
 
-
-class CategoriesViewSet(MixinSetList):
+class CategoriesViewSet(CreateDestroyListMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
@@ -92,7 +85,8 @@ class CategoriesViewSet(MixinSetList):
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = (Title.objects.all().
+                annotate(rating=Avg('reviews__score')).order_by('-id'))
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -113,7 +107,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        return Review.objects.filter(title_id=title_id).all()
+        return Title.objects.get(id=title_id).reviews.all()
 
     def perform_create(self, serializer):
         serializer.save(
@@ -138,8 +132,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, id=review_id)
-        return Comment.objects.filter(review=review).all()
+        return Review.objects.get(id=review_id).comments.all()
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user,
@@ -182,7 +175,7 @@ def SignupUser(request):
         'Confirmation_code',
         f'Код подтверждения для {serializer.validated_data["username"]}: '
         f'{confirmation_code}',
-        EMAIL,
+        st.DEFAULT_FROM_EMAIL,
         (email, ),
         fail_silently=False
     )
