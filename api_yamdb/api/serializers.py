@@ -137,7 +137,9 @@ class SignupUserSerializer(serializers.Serializer):
 
     def validate(self, data):
         if data['username'] == 'me':
-            raise serializers.ValidationError('"me" — запретное имя пользователя')
+            raise serializers.ValidationError(
+                '"me" — запретное имя пользователя'
+            )
 
         if len(data['username']) < 3:
             raise serializers.ValidationError(
@@ -150,7 +152,9 @@ class SignupUserSerializer(serializers.Serializer):
 
         if User.objects.filter(username=data['username']).exists():
             if not User.objects.filter(email=data['email']).exists():
-                raise serializers.ValidationError('такой username уже существует')
+                raise serializers.ValidationError(
+                    'такой username уже существует'
+                )
 
         return data
 
