@@ -1,10 +1,7 @@
-from rest_framework import serializers, status
-from rest_framework.validators import UniqueTogetherValidator
-from django.db.models import Avg
-from django.shortcuts import get_object_or_404
+from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from reviews.models import Comment, Review, Title, Category, Genre, GenreTitle
+from reviews.models import Comment, Review, Title, Category, Genre
 
 User = get_user_model()
 
@@ -12,7 +9,7 @@ User = get_user_model()
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('name', 'slug')
+        exclude = ('id', )
         lookup_field = 'slug'
 
 
@@ -22,7 +19,7 @@ class TitlesField(serializers.SlugRelatedField):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()
+    rating = serializers.FloatField(read_only=True)
     genre = TitlesField(
         queryset=Genre.objects.all(),
         slug_field='slug', many=True
@@ -42,21 +39,13 @@ class TitleSerializer(serializers.ModelSerializer):
             'description',
             'genre',
             'category'
-            )
-        ordering = ['-id']
-    def get_rating(self, obj):
-        return (
-            Review.
-            objects.
-            filter(title=obj).
-            aggregate(Avg('score'))['score__avg']
         )
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = ('name','slug')
+        exclude = ('id', )
         lookup_field = 'slug'
 
 
@@ -79,6 +68,7 @@ class UserSerializer(serializers.ModelSerializer):
             ),
         )
         
+
 
 class UserMeSerializer(serializers.ModelSerializer):
     role = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -116,12 +106,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         title_id = self.context.get('view').kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
         author = self.context.get('request').user
 
-        review = Review.objects.filter(title=title, author=author)
-
-        if review and not self.partial:
+        if (Review.objects.filter(title_id=title_id, author=author).exists()
+                and not self.partial):
             raise serializers.ValidationError(
                 'Вы можете оставить только один отзыв'
             )
@@ -156,16 +144,16 @@ class SignupUserSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 'слишком короткое имя пользователя'
             )
-        
-        if (
-                User.
-                objects.
-                filter(email=data['email'], username=data['username']).
-                exists()
-        ):
-            raise serializers.ValidationError(
-                'такие email или имя пользователя уже существуют'
-            )
+
+        if User.objects.filter(email=data['email']).exists():
+            if not User.objects.filter(username=data['username']).exists():
+                raise serializers.ValidationError('такой email уже существует')
+
+        if User.objects.filter(username=data['username']).exists():
+            if not User.objects.filter(email=data['email']).exists():
+                raise serializers.ValidationError(
+                    'такой username уже существует'
+                )
 
         return data
 

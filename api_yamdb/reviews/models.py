@@ -43,6 +43,7 @@ class Title(models.Model):
     class Meta:
         ordering = ['-id']
 
+
 class GenreTitle(models.Model):
     title = models.ForeignKey(Title, on_delete=models.SET_NULL, null=True)
     genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
@@ -61,9 +62,13 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews',
     )
-    score = models.IntegerField(
-        choices=CHOICES,
-        default=0,
+    score = models.PositiveIntegerField(
+        validators=[
+            MaxValueValidator(
+                10,
+                message='Поставьте оценку в диапазоне от 0 до 10'
+            )
+        ]
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -75,6 +80,7 @@ class Review(models.Model):
             models.UniqueConstraint(fields=['title', 'author'],
                                     name='one_review')
         ]
+
 
 class Comment(models.Model):
     review = models.ForeignKey(

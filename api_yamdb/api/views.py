@@ -1,17 +1,16 @@
+from django.conf import settings as st
 from django.core.mail import send_mail
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
-from django.db import IntegrityError
+from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
-    permissions,
     viewsets,
-    generics,
     status,
     filters,
     mixins
@@ -32,21 +31,17 @@ from .serializers import (
     TokenUserSerializer
 )
 from .permissions import (
-    IsAuthorOrReadOnly,
-    IsModeratorPermission,
     IsAdminPermission,
     IsAuthenticatedPermission,
     IsAdminOrReadOnlyPermission,
-
+    IsAuthorModeratorAdminPermission,
 )
 from .filters import TitleFilter
 
 User = get_user_model()
 
 
-EMAIL = 'from@example.com'
-
-class MixinSetList(
+class CreateDestroyListMixin(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,
@@ -55,67 +50,42 @@ class MixinSetList(
     pass
 
 
-class GenresViewSet(MixinSetList):
+class GenresViewSet(CreateDestroyListMixin):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
     search_fields = ('name', )
     lookup_field = 'slug'
-    ordering_fields = ('-id',)
-    def get_permissions(self):
-        if self.action in ['destroy','create']:
-            permission_classes = [IsAdminOrReadOnlyPermission]
-        else:
-            permission_classes = [AllowAny]
-        return [permission() for permission in permission_classes]
-
-    def get_permissions(self):
-        if self.action in ['destroy','create']:
-            permission_classes = [IsAdminOrReadOnlyPermission]
-        else:
-            permission_classes = [AllowAny]
-        return [permission() for permission in permission_classes]
+    permission_classes = (IsAdminOrReadOnlyPermission, )
 
 
-class CategoriesViewSet(MixinSetList):
+class CategoriesViewSet(CreateDestroyListMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
+    filter_backends = (filters.SearchFilter,)
+    permission_classes = (IsAdminOrReadOnlyPermission,)
     search_fields = ('name', )
     lookup_field = 'slug'
-    ordering_fields = ('-id',)
-    def get_permissions(self):
-        if self.action in ['destroy','create']:
-            permission_classes = [IsAdminOrReadOnlyPermission]
-        else:
-            permission_classes = [AllowAny]
-        return [permission() for permission in permission_classes]
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = (Title.objects.all().
+                annotate(rating=Avg('reviews__score')).order_by('-id'))
     serializer_class = TitleSerializer
-    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filter_backends = (DjangoFilterBackend,)
+    permission_classes = (IsAdminOrReadOnlyPermission,)
     filterset_class = TitleFilter
-    ordering_fields = ('-id',)
-    def get_permissions(self):
-        if self.action in ['destroy', 'update', 'partial_update', 'create']:
-            permission_classes = [IsAdminOrReadOnlyPermission]
-        else:
-            permission_classes = [AllowAny]
-
-        return [permission() for permission in permission_classes]
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
-    ordering_fields = ('-id',)
+    permission_classes = (IsAuthorModeratorAdminPermission,)
+
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        return Review.objects.filter(title_id=title_id).all()
+        return Title.objects.get(id=title_id).reviews.all()
 
     def perform_create(self, serializer):
         serializer.save(
@@ -123,42 +93,26 @@ class ReviewViewSet(viewsets.ModelViewSet):
             title=get_object_or_404(Title, id=self.kwargs.get('title_id')),
         )
 
-    def get_permissions(self):
-        if self.action in ['destroy','update','partial_update']:
-            permission_classes = [
-                IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
-        else:
-            permission_classes = [IsAuthenticatedOrReadOnly]
-
-
-        return [permission() for permission in permission_classes]
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
-    ordering_fields = ('-id',)
+    permission_classes = (IsAuthorModeratorAdminPermission,)
+
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, id=review_id)
-        return Comment.objects.filter(review=review).all()
+        return Review.objects.get(id=review_id).comments.all()
 
     def perform_create(self, serializer):
+        title_id = self.kwargs.get('title_id')
+        review_id = self.kwargs.get('review_id')
         serializer.save(author=self.request.user,
-                        review=get_object_or_404(Review, id=self.kwargs.get(
-                            'review_id')),
-                        )
-
-    def get_permissions(self):
-        if self.action in ['destroy', 'update', 'partial_update']:
-            permission_classes = [
-                IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
-        else:
-            permission_classes = [IsAuthenticatedOrReadOnly]
-
-        return [permission() for permission in permission_classes]
+                        review=get_object_or_404(
+                            Review,
+                            id=review_id,
+                            title_id=title_id
+                        ))
 
 
 @api_view(['POST'])
@@ -168,24 +122,17 @@ def SignupUser(request):
     serializer.is_valid(raise_exception=True)
     email = serializer.validated_data['email']
     username = serializer.validated_data['username']
-    try:
-        user, create = User.objects.get_or_create(
-            username=username,
-            email=email
-        )
-    except IntegrityError:
-        return Response(
-            'Такой логин или email уже существуют',
-            status=status.HTTP_400_BAD_REQUEST
-        )
+
+    user, _ = User.objects.get_or_create(username=username, email=email)
 
     confirmation_code = str(uuid.uuid4())
     user.confirmation_code = confirmation_code
     user.save()
     send_mail(
         'Confirmation_code',
-        f'Код подтверждения для {serializer.validated_data["username"]}: {confirmation_code}',
-        EMAIL,
+        f'Код подтверждения для {serializer.validated_data["username"]}: '
+        f'{confirmation_code}',
+        st.DEFAULT_FROM_EMAIL,
         (email, ),
         fail_silently=False
     )

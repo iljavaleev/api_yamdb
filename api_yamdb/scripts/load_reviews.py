@@ -20,7 +20,7 @@ def run():
         title, created = Title.objects.get_or_create(id=row[1])
         try:
             author = User.objects.get(id=row[3])
-        except Exception as ex:
+        except Exception:
             raise UserNotFoundError
 
         review = Review(
@@ -30,5 +30,5 @@ def run():
             author=author,
             score=row[4],
             pub_date=row[5]
-            )
+        )
         review.save()

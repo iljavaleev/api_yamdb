@@ -23,12 +23,10 @@ class User(AbstractUser):
         max_length=150,
         blank=True
     )
-    
     last_name = models.CharField(
         max_length=150,
         blank=True
     )
-    
     username = models.CharField(
         'Имя пользователя',
         max_length=150,
@@ -36,7 +34,7 @@ class User(AbstractUser):
     )
 
     role = models.CharField(
-        max_length=9,
+        max_length=20,
         blank=False,
         choices=ROLES,
         default=USER,
@@ -47,7 +45,6 @@ class User(AbstractUser):
         max_length=254,
         unique=True,
     )
-    
     confirmation_code = models.CharField(
         verbose_name='confirmation code',
         max_length=50,
@@ -57,12 +54,12 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == "admin" or self.is_superuser
+        return self.role == User.ADMIN or self.is_superuser
 
     @property
     def is_moderator(self):
-        return self.role == "moderator"
+        return self.role == User.MODERATOR
 
     @property
     def is_user(self):
-        return self.role == "user"
+        return self.role == User.USER

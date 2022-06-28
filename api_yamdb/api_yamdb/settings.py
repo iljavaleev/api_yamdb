@@ -27,14 +27,12 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'reviews.apps.ActionsConfig',
 
-
+    'rest_framework_simplejwt',
     'django_extensions',
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
-    'rest_framework_simplejwt',
     'drf_spectacular',
-
 ]
 
 MIDDLEWARE = [
@@ -120,9 +118,8 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', 
+        'rest_framework.permissions.IsAuthenticated',
     ],
-
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
@@ -133,9 +130,10 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     # Устанавливаем срок жизни токена
-   'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
-   'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+DEFAULT_FROM_EMAIL = 'from@example.com'
