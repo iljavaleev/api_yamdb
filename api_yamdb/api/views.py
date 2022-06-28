@@ -7,7 +7,6 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from django.db import IntegrityError
-from django.db.models import CharField, Value
 from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
@@ -33,12 +32,10 @@ from .serializers import (
     TokenUserSerializer
 )
 from .permissions import (
-    IsAuthorOrReadOnly,
-    IsModeratorPermission,
     IsAdminPermission,
     IsAuthenticatedPermission,
     IsAdminOrReadOnlyPermission,
-
+    IsAuthorModeratorAdminPermission,
 )
 from .filters import TitleFilter
 
@@ -60,28 +57,16 @@ class GenresViewSet(CreateDestroyListMixin):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', )
     lookup_field = 'slug'
-
-    def get_permissions(self):
-        if self.action in ['destroy', 'create']:
-            permission_classes = [IsAdminOrReadOnlyPermission]
-        else:
-            permission_classes = [AllowAny]
-        return [permission() for permission in permission_classes]
+    permission_classes=(IsAdminOrReadOnlyPermission, )
 
 
 class CategoriesViewSet(CreateDestroyListMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
+    permission_classes = (IsAdminOrReadOnlyPermission,)
     search_fields = ('name', )
     lookup_field = 'slug'
-
-    def get_permissions(self):
-        if self.action in ['destroy', 'create']:
-            permission_classes = [IsAdminOrReadOnlyPermission]
-        else:
-            permission_classes = [AllowAny]
-        return [permission() for permission in permission_classes]
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
@@ -89,21 +74,15 @@ class TitlesViewSet(viewsets.ModelViewSet):
                 annotate(rating=Avg('reviews__score')).order_by('-id'))
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
+    permission_classes = (IsAdminOrReadOnlyPermission,)
     filterset_class = TitleFilter
-
-    def get_permissions(self):
-        if self.action in ['destroy', 'update', 'partial_update', 'create']:
-            permission_classes = [IsAdminOrReadOnlyPermission]
-        else:
-            permission_classes = [AllowAny]
-
-        return [permission() for permission in permission_classes]
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
+    permission_classes = (IsAuthorModeratorAdminPermission,)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -115,20 +94,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
             title=get_object_or_404(Title, id=self.kwargs.get('title_id')),
         )
 
-    def get_permissions(self):
-        if self.action in ['destroy', 'update', 'partial_update']:
-            permission_classes = [
-                IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
-        else:
-            permission_classes = [IsAuthenticatedOrReadOnly]
-
-        return [permission() for permission in permission_classes]
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
+    permission_classes = (IsAuthorModeratorAdminPermission,)
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
@@ -143,15 +114,6 @@ class CommentViewSet(viewsets.ModelViewSet):
                             id=review_id,
                             title_id=title_id
                         ))
-
-    def get_permissions(self):
-        if self.action in ['destroy', 'update', 'partial_update']:
-            permission_classes = [
-                IsAuthorOrReadOnly | IsModeratorPermission | IsAdminPermission]
-        else:
-            permission_classes = [IsAuthenticatedOrReadOnly]
-
-        return [permission() for permission in permission_classes]
 
 
 @api_view(['POST'])
