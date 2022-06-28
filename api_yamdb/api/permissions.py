@@ -58,5 +58,5 @@ class IsAdminOrReadOnlyPermission(permissions.BasePermission):
             request.method in permissions.SAFE_METHODS
             or request.user.is_authenticated
             and (hasattr(request.user, 'role')
-                and request.user.is_admin)
+                 and request.user.is_admin)
         )

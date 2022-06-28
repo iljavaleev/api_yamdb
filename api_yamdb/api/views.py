@@ -2,11 +2,10 @@ from django.conf import settings as st
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
-from django.db import IntegrityError
 from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
@@ -57,7 +56,7 @@ class GenresViewSet(CreateDestroyListMixin):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', )
     lookup_field = 'slug'
-    permission_classes=(IsAdminOrReadOnlyPermission, )
+    permission_classes = (IsAdminOrReadOnlyPermission, )
 
 
 class CategoriesViewSet(CreateDestroyListMixin):
@@ -124,10 +123,7 @@ def SignupUser(request):
     email = serializer.validated_data['email']
     username = serializer.validated_data['username']
 
-    user, _ = User.objects.get_or_create(
-            username=username,
-            email=email
-    )
+    user, _ = User.objects.get_or_create(username=username, email=email)
 
     confirmation_code = str(uuid.uuid4())
     user.confirmation_code = confirmation_code

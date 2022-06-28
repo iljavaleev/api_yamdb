@@ -1,6 +1,4 @@
 from rest_framework import serializers
-from django.db.models import Avg
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
 from reviews.models import Comment, Review, Title, Category, Genre
