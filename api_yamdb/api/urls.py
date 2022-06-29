@@ -1,5 +1,3 @@
-# насчет создания дерикторий пока не совсем понимаю,
-# и чтобы не все не покрашить оставлю так
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
@@ -15,7 +13,7 @@ router.register('titles', TitlesViewSet, basename='titles')
 router.register(r'titles/(?P<title_id>\d+)/reviews', ReviewViewSet,
                 basename='reviews')
 router.register(
-    r'titles/(?P<title_id>[0-9]+)/reviews/(?P<review_id>\d+)/comments',
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet,
     basename='comments'
 )

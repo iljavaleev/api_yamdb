@@ -50,7 +50,6 @@ class GenreTitle(models.Model):
 
 
 class Review(models.Model):
-    CHOICES = [(i, i) for i in range(11)]
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
