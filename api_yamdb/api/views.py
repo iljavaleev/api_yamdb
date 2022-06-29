@@ -56,7 +56,7 @@ class GenresViewSet(CreateDestroyListMixin):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', )
     lookup_field = 'slug'
-    permission_classes = (IsAdminOrReadOnlyPermission, )
+    permission_classes = (IsAdminOrReadOnlyPermission,)
 
 
 class CategoriesViewSet(CreateDestroyListMixin):
